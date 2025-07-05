@@ -19,6 +19,7 @@ import {
     Zap
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { MoodChatbot } from "../ai/MoodChatbot";
 import { TaskQuickAdd } from "../tasks/TaskQuickAdd";
 
@@ -65,6 +66,7 @@ function getMoodColor(label: string) {
 }
 
 export function Dashboard() {
+  const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userName] = useState("Friend"); // In a real app, this would come from user settings
   const [affirmationIndex, setAffirmationIndex] = useState(0);
@@ -170,6 +172,27 @@ export function Dashboard() {
     return distribution;
   }, [last7]);
 
+  // Navigation handlers
+  const handleAddMood = () => {
+    navigate('/mood');
+  };
+
+  const handleStartBreathing = () => {
+    navigate('/wellness');
+  };
+
+  const handleWellnessCenter = () => {
+    navigate('/wellness');
+  };
+
+  const handleViewTasks = () => {
+    navigate('/tasks');
+  };
+
+  const handleViewHistory = () => {
+    navigate('/history');
+  };
+
   return (
     <div className="space-y-12 animate-fade-in">
       {/* Welcome Header with Enhanced Design */}
@@ -197,6 +220,7 @@ export function Dashboard() {
           </div>
           <div className="flex flex-wrap gap-3">
             <Button 
+              onClick={handleAddMood}
               variant="outline" 
               size="lg" 
               className="flex items-center gap-2 bg-background/80 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-105"
@@ -204,6 +228,7 @@ export function Dashboard() {
               <Sparkles className="w-5 h-5" /> Add Mood
             </Button>
             <Button 
+              onClick={handleStartBreathing}
               variant="outline" 
               size="lg" 
               className="flex items-center gap-2 bg-background/80 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-105"
@@ -211,6 +236,7 @@ export function Dashboard() {
               <Zap className="w-5 h-5" /> Start Breathing
             </Button>
             <Button 
+              onClick={handleWellnessCenter}
               variant="outline" 
               size="lg" 
               className="flex items-center gap-2 bg-background/80 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-105"
@@ -224,7 +250,7 @@ export function Dashboard() {
       {/* Enhanced Overview Grid with Better Spacing */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
         {/* Mood Trend with Enhanced Visualization */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden">
+        <Card className="group border-none shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden cursor-pointer" onClick={handleViewHistory}>
           <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           <CardHeader className="relative">
             <CardTitle className="text-lg flex items-center gap-2 text-blue-700 dark:text-blue-300">
@@ -259,7 +285,7 @@ export function Dashboard() {
         </Card>
 
         {/* Task Progress with Enhanced Ring */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden">
+        <Card className="group border-none shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden cursor-pointer" onClick={handleViewTasks}>
           <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           <CardHeader className="relative">
             <CardTitle className="text-lg flex items-center gap-2 text-green-700 dark:text-green-300">
@@ -293,7 +319,7 @@ export function Dashboard() {
         </Card>
 
         {/* Mood Streak with Fire Effect */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden">
+        <Card className="group border-none shadow-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden cursor-pointer" onClick={handleAddMood}>
           <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           <CardHeader className="relative">
             <CardTitle className="text-lg flex items-center gap-2 text-orange-700 dark:text-orange-300">
@@ -323,7 +349,7 @@ export function Dashboard() {
         </Card>
 
         {/* Task Streak with Achievement Badge */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden">
+        <Card className="group border-none shadow-xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden cursor-pointer" onClick={handleViewTasks}>
           <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
           <CardHeader className="relative">
             <CardTitle className="text-lg flex items-center gap-2 text-purple-700 dark:text-purple-300">
@@ -355,7 +381,7 @@ export function Dashboard() {
 
       {/* Mood Distribution Chart */}
       {Object.keys(moodDistribution).length > 0 && (
-        <Card className="border-none shadow-xl bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-900/20 dark:to-gray-900/20 overflow-hidden">
+        <Card className="border-none shadow-xl bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-900/20 dark:to-gray-900/20 overflow-hidden cursor-pointer" onClick={handleViewHistory}>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
               <BarChart3 className="w-5 h-5" /> Weekly Mood Distribution
@@ -407,7 +433,7 @@ export function Dashboard() {
       </div>
 
       {/* Recent Activity with Enhanced Timeline */}
-      <Card className="border-none shadow-xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 overflow-hidden">
+      <Card className="border-none shadow-xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 overflow-hidden cursor-pointer" onClick={handleViewHistory}>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
             <Calendar className="w-5 h-5" /> Recent Activity
