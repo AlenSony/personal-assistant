@@ -467,8 +467,8 @@ export function TaskQuickAdd({ onTaskAdd }: { onTaskAdd?: (task: any) => void })
         <p>📧 Tasks with email keywords will automatically generate email suggestions</p>
       </div>
 
-      {/* Email Suggestion */}
-      {showEmailSuggestion && emailSuggestion && (
+      {/* Email Generator */}
+      {showEmailSuggestion && (
         <div className="mt-6">
           <EmailSuggestionCard
             suggestion={emailSuggestion}

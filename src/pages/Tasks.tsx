@@ -1,3 +1,4 @@
+import { EmailSuggestionCard } from "@/components/tasks/EmailSuggestion";
 import { TaskQuickAdd } from "@/components/tasks/TaskQuickAdd";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ import {
     Clock,
     Edit3,
     Filter,
+    Mail,
     Search,
     Trash2,
     Zap
@@ -32,6 +34,7 @@ interface Task extends TaskEntry {}
 
 export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [showEmailGenerator, setShowEmailGenerator] = useState(false);
 
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
@@ -315,10 +318,21 @@ export default function Tasks() {
     <div className="space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <h1 className="text-3xl font-bold text-foreground">Task Organizer</h1>
-        <p className="text-muted-foreground">
-          Manage your tasks with smart prioritization and natural language input 📝
-        </p>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground">Task Organizer</h1>
+            <p className="text-muted-foreground">
+              Manage your tasks with smart prioritization and natural language input 📝
+            </p>
+          </div>
+          <Button
+            onClick={() => setShowEmailGenerator(true)}
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            AI Email Generator
+          </Button>
+        </div>
       </div>
 
       {/* Quick Add Task */}
@@ -612,6 +626,17 @@ export default function Tasks() {
           )}
         </TabsContent>
       </Tabs>
+
+      {/* Email Generator Modal */}
+      {showEmailGenerator && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <EmailSuggestionCard
+              onClose={() => setShowEmailGenerator(false)}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
