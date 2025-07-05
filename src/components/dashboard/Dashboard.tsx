@@ -1,24 +1,24 @@
-import orbitAvatar from "@/assets/orbit-avatar.png";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ProgressRing } from "@/components/ui/progress-ring";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle
+} from "@/components/ui/dialog";
 import { historyService, type HistoryEntry } from "@/services/history-service";
 import {
-    Activity,
-    Award,
-    BarChart3,
-    Calendar,
     CheckCircle,
     Clock,
     Heart,
     Pause,
-    Play,
+    Plus,
     RefreshCw,
     Sparkles,
-    Star,
-    Target,
     Timer,
     TrendingUp,
+    X,
     Zap
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -121,6 +121,13 @@ export function Dashboard() {
         setBreathingTime(prev => {
           if (prev <= 1) {
             setIsBreathingActive(false);
+            // Show completion notification when session ends naturally
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('Breathing Session Complete! 🧘‍♀️', {
+                body: 'Great job completing your breathing session. How do you feel now?',
+                icon: '/favicon.ico'
+              });
+            }
             return 0;
           }
           return prev - 1;
@@ -254,6 +261,14 @@ export function Dashboard() {
     historyService.saveMood(moodEntry);
     setHistoryData(historyService.getHistory());
     setShowQuickMood(false);
+    
+    // Show success feedback
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Mood Tracked! 😊', {
+        body: `You marked yourself as ${mood.label.toLowerCase()}. Keep up the great self-awareness!`,
+        icon: '/favicon.ico'
+      });
+    }
   };
 
   // Breathing handlers
@@ -268,6 +283,14 @@ export function Dashboard() {
   const handleStopBreathing = () => {
     setIsBreathingActive(false);
     setBreathingTime(0);
+    
+    // Show completion feedback
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Breathing Session Complete! 🧘‍♀️', {
+        body: 'Great job taking time for yourself. How do you feel now?',
+        icon: '/favicon.ico'
+      });
+    }
   };
 
   const formatTime = (seconds: number) => {
@@ -277,383 +300,416 @@ export function Dashboard() {
   };
 
   return (
-    <div className="space-y-12 animate-fade-in">
-      {/* Welcome Header with Enhanced Design */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-primary/5 to-accent/10 p-8 border border-primary/20">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 opacity-50"></div>
-        <div className="relative flex flex-col md:flex-row items-center gap-8">
-          <div className="relative group">
-            <div className="absolute inset-0 bg-gradient-to-r from-primary to-accent rounded-full blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
-            <img 
-              src={orbitAvatar} 
-              alt="Orbit" 
-              className="relative w-20 h-20 rounded-full shadow-2xl border-4 border-background transition-transform duration-300 group-hover:scale-110"
-            />
-            <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border-3 border-background flex items-center justify-center shadow-lg">
-              <span className="text-sm">{todayMoodEmoji || "✨"}</span>
-            </div>
-          </div>
-          <div className="flex-1 text-center md:text-left">
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-2">
-              {getGreeting()}, {userName}! {todayMoodEmoji && <span className="inline-block animate-bounce">{todayMoodEmoji}</span>}
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto px-4 py-4 sm:py-8 overflow-x-hidden dashboard-container">
+      {/* Enhanced Header Section */}
+      <div className="text-center space-y-4 sm:space-y-6">
+        <div className="relative">
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-purple-500/20 to-pink-500/20 blur-3xl rounded-full"></div>
+          <div className="relative">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold gradient-text mb-3 sm:mb-4 animate-fade-in">
+              {getGreeting()}, {userName}! ✨
             </h1>
-            <p className="text-lg text-muted-foreground font-medium">
-              {affirmations[affirmationIndex]}
+            <p className="text-base sm:text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto">
+              Let's make today amazing. How are you feeling?
             </p>
-          </div>
-          <div className="flex flex-wrap gap-3">
-            <Button 
-              onClick={() => setShowQuickMood(!showQuickMood)}
-              variant="outline" 
-              size="lg" 
-              className="flex items-center gap-2 bg-background/80 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-105"
-            >
-              <Sparkles className="w-5 h-5" /> Add Mood
-            </Button>
-            <Button 
-              onClick={() => setShowBreathingOptions(!showBreathingOptions)}
-              variant="outline" 
-              size="lg" 
-              className="flex items-center gap-2 bg-background/80 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-105"
-            >
-              <Zap className="w-5 h-5" /> Start Breathing
-            </Button>
-            <Button 
-              onClick={() => setShowWellnessActivities(!showWellnessActivities)}
-              variant="outline" 
-              size="lg" 
-              className="flex items-center gap-2 bg-background/80 backdrop-blur-sm hover:bg-background transition-all duration-300 hover:scale-105"
-            >
-              <Heart className="w-5 h-5" /> Wellness Center
-            </Button>
           </div>
         </div>
 
-        {/* Quick Mood Selector */}
-        {showQuickMood && (
-          <div className="mt-6 p-4 bg-background/80 backdrop-blur-sm rounded-lg border border-primary/20">
-            <h3 className="text-lg font-semibold mb-3 text-primary-foreground">How are you feeling right now?</h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
-              {quickMoods.map((mood) => (
-                <Button
-                  key={mood.label}
-                  onClick={() => handleQuickMood(mood)}
-                  variant="outline"
-                  className="flex flex-col items-center gap-2 p-4 h-auto bg-background/60 hover:bg-background transition-all duration-300 hover:scale-105"
-                >
-                  <span className="text-2xl">{mood.emoji}</span>
-                  <span className="text-sm font-medium">{mood.label}</span>
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Breathing Options */}
-        {showBreathingOptions && (
-          <div className="mt-6 p-4 bg-background/80 backdrop-blur-sm rounded-lg border border-primary/20">
-            <h3 className="text-lg font-semibold mb-3 text-primary-foreground">Choose a breathing technique</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {breathingTechniques.map((technique) => (
-                <Button
-                  key={technique.name}
-                  onClick={() => handleStartBreathingSession(technique)}
-                  variant="outline"
-                  className="flex flex-col items-center gap-2 p-4 h-auto bg-background/60 hover:bg-background transition-all duration-300 hover:scale-105"
-                >
-                  <Timer className="w-6 h-6 text-primary" />
-                  <div className="text-center">
-                    <div className="font-semibold">{technique.name}</div>
-                    <div className="text-sm text-muted-foreground">{technique.duration}</div>
-                    <div className="text-xs text-muted-foreground">{technique.description}</div>
-                  </div>
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Wellness Activities */}
-        {showWellnessActivities && (
-          <div className="mt-6 p-4 bg-background/80 backdrop-blur-sm rounded-lg border border-primary/20">
-            <h3 className="text-lg font-semibold mb-3 text-primary-foreground">Wellness activities</h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-              {wellnessActivities.map((activity) => (
-                <Button
-                  key={activity.name}
-                  onClick={() => navigate('/wellness')}
-                  variant="outline"
-                  className="flex flex-col items-center gap-2 p-4 h-auto bg-background/60 hover:bg-background transition-all duration-300 hover:scale-105"
-                >
-                  <span className="text-2xl">{activity.icon}</span>
-                  <div className="text-center">
-                    <div className="font-semibold text-sm">{activity.name}</div>
-                    <div className="text-xs text-muted-foreground">{activity.duration}</div>
-                    <div className="text-xs text-muted-foreground">{activity.description}</div>
-                  </div>
-                </Button>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Current Time Display */}
+        <div className="flex items-center justify-center gap-2 text-muted-foreground">
+          <Clock className="w-4 h-4" />
+          <span className="text-sm font-medium">
+            {currentTime.toLocaleTimeString('en-US', { 
+              hour: 'numeric', 
+              minute: '2-digit',
+              hour12: true 
+            })}
+          </span>
+        </div>
       </div>
 
-      {/* Active Breathing Session */}
-      {isBreathingActive && (
-        <Card className="border-none shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 overflow-hidden">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-blue-700 dark:text-blue-300">
-              <Timer className="w-5 h-5" /> Active Breathing Session
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center gap-4">
-              <div className="text-6xl font-bold text-blue-600 dark:text-blue-400 animate-pulse">
-                {formatTime(breathingTime)}
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-semibold text-blue-700 dark:text-blue-300">
-                  {selectedBreathing.name}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  {selectedBreathing.description}
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <Button
-                  onClick={handleStopBreathing}
-                  variant="outline"
-                  className="flex items-center gap-2"
-                >
-                  <Pause className="w-4 h-4" />
-                  Stop Session
-                </Button>
-                <Button
-                  onClick={() => navigate('/wellness')}
-                  className="flex items-center gap-2"
-                >
-                  <Play className="w-4 h-4" />
-                  Full Session
-                </Button>
-              </div>
+      {/* Quick Actions Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 quick-actions-grid">
+        <Card className="card-hover border-none shadow-lg bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl mx-auto mb-3 sm:mb-4 animate-float">
+              😊
             </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Enhanced Overview Grid with Better Spacing */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        {/* Mood Trend with Enhanced Visualization */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden cursor-pointer" onClick={handleViewHistory}>
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-indigo-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardHeader className="relative">
-            <CardTitle className="text-lg flex items-center gap-2 text-blue-700 dark:text-blue-300">
-              <TrendingUp className="w-5 h-5" /> Mood Trend
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="flex items-end gap-3 h-20 mb-4">
-              {last7.map((d, i) => (
-                <div key={i} className="flex flex-col items-center group/item">
-                  <span className="text-2xl mb-2 transition-transform duration-300 group-hover/item:scale-125">{d.emoji}</span>
-                  <div 
-                    className={`w-4 rounded-full transition-all duration-500 ${
-                      d.mood 
-                        ? 'bg-gradient-to-t from-blue-600 to-blue-400 shadow-lg' 
-                        : 'bg-gray-200 dark:bg-gray-700'
-                    }`} 
-                    style={{ 
-                      height: `${d.mood ? 40 + (i * 2) : 16}px`,
-                      minHeight: '16px'
-                    }} 
-                  />
-                </div>
-              ))}
-            </div>
-            <div className="flex justify-between text-xs text-muted-foreground">
-              {last7.map((d, i) => (
-                <span key={i} className="font-medium">{d.date.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 2)}</span>
-              ))}
+            <h3 className="font-semibold text-base sm:text-lg mb-2">Track Mood</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">How are you feeling today?</p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button 
+                onClick={() => setShowQuickMood(true)} 
+                className="btn-primary-glow flex-1"
+              >
+                Quick Check
+              </Button>
+              <Button 
+                onClick={() => navigate('/mood')} 
+                variant="outline"
+                className="flex-1"
+              >
+                Detailed
+              </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Task Progress with Enhanced Ring */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden cursor-pointer" onClick={handleViewTasks}>
-          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 to-emerald-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardHeader className="relative">
-            <CardTitle className="text-lg flex items-center gap-2 text-green-700 dark:text-green-300">
-              <CheckCircle className="w-5 h-5" /> Task Progress
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="flex flex-col items-center gap-4">
-              <div className="relative">
-                <ProgressRing 
-                  progress={taskProgress} 
-                  size={80} 
-                  strokeWidth={8} 
-                  showLabel 
-                  className="drop-shadow-lg"
-                />
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <Target className="w-6 h-6 text-green-600 dark:text-green-400" />
-                </div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-green-700 dark:text-green-300">
-                  {tasksCompleted} / {tasksTotal}
-                </div>
-                <div className="text-sm text-muted-foreground">
-                  tasks completed today
-                </div>
-              </div>
+        <Card className="card-hover border-none shadow-lg bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl mx-auto mb-3 sm:mb-4 animate-float" style={{ animationDelay: '1s' }}>
+              🧘‍♀️
+            </div>
+            <h3 className="font-semibold text-base sm:text-lg mb-2">Wellness Break</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Take a moment to breathe</p>
+            <div className="flex flex-col sm:flex-row gap-2">
+              <Button 
+                onClick={() => setShowBreathingOptions(true)} 
+                className="btn-primary-glow flex-1"
+              >
+                Breathing
+              </Button>
+              <Button 
+                onClick={() => setShowWellnessActivities(true)} 
+                variant="outline"
+                className="flex-1"
+              >
+                Activities
+              </Button>
             </div>
           </CardContent>
         </Card>
 
-        {/* Mood Streak with Fire Effect */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden cursor-pointer" onClick={() => setShowQuickMood(!showQuickMood)}>
-          <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardHeader className="relative">
-            <CardTitle className="text-lg flex items-center gap-2 text-orange-700 dark:text-orange-300">
-              <Heart className="w-5 h-5" /> Mood Streak
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="flex flex-col items-center gap-3">
-              <div className="relative">
-                <div className="text-4xl font-bold text-orange-600 dark:text-orange-400 animate-pulse">
-                  {moodStreak}
-                </div>
-                <div className="absolute -top-2 -right-2">
-                  <Star className="w-4 h-4 text-yellow-500 fill-current" />
-                </div>
+        <Card className="card-hover border-none shadow-lg bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-900/20 dark:to-violet-900/20">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-500 to-violet-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl mx-auto mb-3 sm:mb-4 animate-float" style={{ animationDelay: '2s' }}>
+              📋
+            </div>
+            <h3 className="font-semibold text-base sm:text-lg mb-2">Quick Task</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Add something to your list</p>
+            <Button 
+              onClick={() => navigate('/tasks')} 
+              className="btn-primary-glow w-full"
+            >
+              Add Task
+            </Button>
+          </CardContent>
+        </Card>
+
+        <Card className="card-hover border-none shadow-lg bg-gradient-to-br from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20">
+          <CardContent className="p-4 sm:p-6 text-center">
+            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-orange-500 to-red-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl mx-auto mb-3 sm:mb-4 animate-float" style={{ animationDelay: '3s' }}>
+              🎯
+            </div>
+            <h3 className="font-semibold text-base sm:text-lg mb-2">Set Goals</h3>
+            <p className="text-xs sm:text-sm text-muted-foreground mb-3 sm:mb-4">Work on your aspirations</p>
+            <Button 
+              onClick={() => navigate('/goals')} 
+              className="btn-primary-glow w-full"
+            >
+              View Goals
+            </Button>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Stats Overview */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 stats-grid">
+        <Card className="card-hover border-none shadow-lg bg-gradient-to-br from-success/10 to-success/5">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Today's Progress</p>
+                <p className="text-2xl font-bold text-success">
+                  {tasksCompleted}/{tasksTotal}
+                </p>
+                <p className="text-xs text-muted-foreground">tasks completed</p>
               </div>
-              <div className="text-center">
-                <div className="text-sm font-medium text-orange-700 dark:text-orange-300">
-                  days same mood
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Keep it up! 🔥
-                </div>
+              <div className="w-12 h-12 bg-success/20 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-6 h-6 text-success" />
+              </div>
+            </div>
+                         <div className="w-full bg-muted rounded-full h-2 mt-4">
+               <div 
+                 className="bg-success h-2 rounded-full transition-all duration-500" 
+                 style={{ width: `${taskProgress}%` }}
+               />
+             </div>
+          </CardContent>
+        </Card>
+
+        <Card className="card-hover border-none shadow-lg bg-gradient-to-br from-primary/10 to-primary/5">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Mood Streak</p>
+                <p className="text-2xl font-bold text-primary">{moodStreak}</p>
+                <p className="text-xs text-muted-foreground">days tracked</p>
+              </div>
+              <div className="w-12 h-12 bg-primary/20 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-6 h-6 text-primary" />
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Task Streak with Achievement Badge */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-105 overflow-hidden cursor-pointer" onClick={handleViewTasks}>
-          <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardHeader className="relative">
-            <CardTitle className="text-lg flex items-center gap-2 text-purple-700 dark:text-purple-300">
-              <RefreshCw className="w-5 h-5" /> Task Streak
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <div className="flex flex-col items-center gap-3">
-              <div className="relative">
-                <div className="text-4xl font-bold text-purple-600 dark:text-purple-400">
-                  {taskStreak}
-                </div>
-                <div className="absolute -top-2 -right-2">
-                  <Award className="w-4 h-4 text-yellow-500 fill-current" />
-                </div>
+        <Card className="card-hover border-none shadow-lg bg-gradient-to-br from-warning/10 to-warning/5">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Task Streak</p>
+                <p className="text-2xl font-bold text-warning">{taskStreak}</p>
+                <p className="text-xs text-muted-foreground">days productive</p>
               </div>
-              <div className="text-center">
-                <div className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                  days all tasks done
-                </div>
-                <div className="text-xs text-muted-foreground mt-1">
-                  Amazing progress! 🎯
-                </div>
+              <div className="w-12 h-12 bg-warning/20 rounded-full flex items-center justify-center">
+                <Zap className="w-6 h-6 text-warning" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="card-hover border-none shadow-lg bg-gradient-to-br from-accent/10 to-accent/5">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-muted-foreground">Current Mood</p>
+                <p className="text-2xl font-bold">{todayMoodEmoji || "😐"}</p>
+                <p className="text-xs text-muted-foreground">{todayMood || "Not tracked"}</p>
+              </div>
+              <div className="w-12 h-12 bg-accent/20 rounded-full flex items-center justify-center">
+                <Heart className="w-6 h-6 text-accent-foreground" />
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Mood Distribution Chart */}
-      {Object.keys(moodDistribution).length > 0 && (
-        <Card className="border-none shadow-xl bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-900/20 dark:to-gray-900/20 overflow-hidden cursor-pointer" onClick={handleViewHistory}>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
-              <BarChart3 className="w-5 h-5" /> Weekly Mood Distribution
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {Object.entries(moodDistribution).map(([mood, count]) => (
-                <div key={mood} className="flex flex-col items-center gap-2 p-4 rounded-lg bg-background/50 backdrop-blur-sm border border-border/50 hover:bg-background/80 transition-all duration-300 hover:scale-105">
-                  <span className="text-3xl">{getMoodEmoji(mood)}</span>
-                  <div className="text-center">
-                    <div className="font-bold text-foreground">{count}</div>
-                    <div className="text-xs text-muted-foreground">{mood}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Quick Actions & Activity with Enhanced Layout */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* Mood Check-in with Enhanced Design */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-primary/10 to-accent/10 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardHeader className="relative">
-            <CardTitle className="text-xl text-primary-foreground flex items-center gap-2">
-              <Activity className="w-6 h-6" /> How are you feeling?
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <MoodChatbot />
-          </CardContent>
-        </Card>
-
-        {/* Quick Task Add with Enhanced Design */}
-        <Card className="group border-none shadow-xl bg-gradient-to-br from-slate-50 to-gray-50 dark:from-slate-900/20 dark:to-gray-900/20 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02] overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-500/5 to-gray-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <CardHeader className="relative">
-            <CardTitle className="text-xl flex items-center gap-2 text-slate-700 dark:text-slate-300">
-              <Clock className="w-6 h-6" /> Add a Task
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="relative">
-            <TaskQuickAdd />
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Recent Activity with Enhanced Timeline */}
-      <Card className="border-none shadow-xl bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/20 dark:to-purple-900/20 overflow-hidden cursor-pointer" onClick={handleViewHistory}>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-indigo-700 dark:text-indigo-300">
-            <Calendar className="w-5 h-5" /> Recent Activity
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-8 justify-center">
-            {recent.map((d, i) => (
-              <div key={i} className="flex flex-col items-center gap-3 group">
-                <div className="relative">
-                  <span className="text-3xl transition-transform duration-300 group-hover:scale-125">{d.emoji}</span>
-                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-500 rounded-full border border-background"></div>
-                </div>
-                <div className="text-center">
-                  <div className="text-sm font-medium text-foreground">
-                    {d.date.toLocaleDateString(undefined, { weekday: 'short' })}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {d.mood || "No mood recorded"}
-                  </div>
-                </div>
-              </div>
-            ))}
+      {/* Daily Affirmation */}
+      <Card className="card-hover border-none shadow-xl bg-gradient-to-br from-primary/5 via-purple-500/5 to-pink-500/5">
+        <CardContent className="p-8 text-center">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-4xl mb-4 animate-float">✨</div>
+            <blockquote className="text-xl font-medium text-foreground mb-4 italic">
+              "{affirmations[affirmationIndex]}"
+            </blockquote>
+            <Button 
+              variant="ghost" 
+              onClick={() => setAffirmationIndex(i => (i + 1) % affirmations.length)}
+              className="text-muted-foreground hover:text-foreground"
+            >
+              <RefreshCw className="w-4 h-4 mr-2" />
+              New affirmation
+            </Button>
           </div>
         </CardContent>
       </Card>
+
+      {/* AI Chat Section */}
+      <Card className="card-hover border-none shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white">
+              <Sparkles className="w-4 h-4" />
+            </div>
+            Chat with Orbit
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <MoodChatbot />
+        </CardContent>
+      </Card>
+
+      {/* Quick Task Add */}
+      <Card className="card-hover border-none shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Plus className="w-5 h-5" />
+            Quick Add Task
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+                     <TaskQuickAdd />
+        </CardContent>
+      </Card>
+
+      {/* Quick Mood Modal */}
+      <Dialog open={showQuickMood} onOpenChange={setShowQuickMood}>
+        <DialogContent className="w-[95vw] max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="text-2xl">😊</span>
+              How are you feeling?
+            </DialogTitle>
+            <DialogDescription>
+              Take a moment to check in with yourself. Your mood matters.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-4">
+            {quickMoods.map((mood) => (
+              <Button
+                key={mood.label}
+                variant="outline"
+                className="h-16 sm:h-20 flex flex-col items-center justify-center gap-1 sm:gap-2 hover:scale-105 transition-transform"
+                onClick={() => handleQuickMood(mood)}
+              >
+                <span className="text-xl sm:text-2xl">{mood.emoji}</span>
+                <span className="text-xs sm:text-sm font-medium">{mood.label}</span>
+              </Button>
+            ))}
+          </div>
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" onClick={() => setShowQuickMood(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => navigate('/mood')}>
+              Detailed Check-in
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Breathing Session Modal */}
+      <Dialog open={showBreathingOptions} onOpenChange={setShowBreathingOptions}>
+        <DialogContent className="w-[95vw] max-w-md mx-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="text-2xl">🧘‍♀️</span>
+              Choose Your Breathing Technique
+            </DialogTitle>
+            <DialogDescription>
+              Select a breathing technique to help you relax and focus.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-3 mt-4">
+            {breathingTechniques.map((technique) => (
+              <Button
+                key={technique.name}
+                variant="outline"
+                className="w-full h-16 flex items-center justify-between p-4 hover:bg-primary/5"
+                onClick={() => handleStartBreathingSession(technique)}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+                    <Timer className="w-5 h-5 text-primary" />
+                  </div>
+                  <div className="text-left">
+                    <div className="font-medium">{technique.name}</div>
+                    <div className="text-sm text-muted-foreground">{technique.description}</div>
+                  </div>
+                </div>
+                <div className="text-sm font-medium text-primary">{technique.duration}</div>
+              </Button>
+            ))}
+          </div>
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" onClick={() => setShowBreathingOptions(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => navigate('/wellness')}>
+              More Wellness Activities
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Active Breathing Session Modal */}
+      <Dialog open={isBreathingActive} onOpenChange={() => !isBreathingActive && handleStopBreathing()}>
+        <DialogContent className="w-[95vw] max-w-sm mx-auto text-center">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-center gap-2">
+              <span className="text-3xl">🧘‍♀️</span>
+              {selectedBreathing.name}
+            </DialogTitle>
+            <DialogDescription>
+              {selectedBreathing.description}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="my-6 sm:my-8">
+            <div className="text-4xl sm:text-6xl font-bold text-primary mb-4">
+              {formatTime(breathingTime)}
+            </div>
+            
+            {/* Breathing animation */}
+            <div className="w-24 h-24 sm:w-32 sm:h-32 mx-auto mb-6 relative">
+              <div className="absolute inset-0 bg-primary/20 rounded-full animate-pulse"></div>
+              <div className="absolute inset-4 bg-primary/40 rounded-full animate-pulse" style={{ animationDelay: '0.5s' }}></div>
+              <div className="absolute inset-8 bg-primary/60 rounded-full animate-pulse" style={{ animationDelay: '1s' }}></div>
+            </div>
+            
+            <div className="text-sm text-muted-foreground mb-6">
+              Breathe in... and out... Focus on your breath
+            </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row justify-center gap-3">
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={handleStopBreathing}
+              className="flex items-center gap-2"
+            >
+              <Pause className="w-4 h-4" />
+              Pause
+            </Button>
+            <Button
+              size="lg"
+              onClick={handleStopBreathing}
+              className="flex items-center gap-2"
+            >
+              <X className="w-4 h-4" />
+              End Session
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Wellness Activities Modal */}
+      <Dialog open={showWellnessActivities} onOpenChange={setShowWellnessActivities}>
+        <DialogContent className="w-[95vw] max-w-lg mx-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <span className="text-2xl">💝</span>
+              Wellness Activities
+            </DialogTitle>
+            <DialogDescription>
+              Choose an activity to boost your well-being and mental health.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid grid-cols-1 gap-3 mt-4">
+            {wellnessActivities.map((activity) => (
+              <Button
+                key={activity.name}
+                variant="outline"
+                className="w-full h-16 flex items-center justify-between p-4 hover:bg-primary/5"
+                onClick={() => {
+                  setShowWellnessActivities(false);
+                  navigate('/wellness');
+                }}
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-xl">
+                    {activity.icon}
+                  </div>
+                  <div className="text-left">
+                    <div className="font-medium">{activity.name}</div>
+                    <div className="text-sm text-muted-foreground">{activity.description}</div>
+                  </div>
+                </div>
+                <div className="text-sm font-medium text-primary">{activity.duration}</div>
+              </Button>
+            ))}
+          </div>
+          <div className="flex justify-end gap-2 mt-6">
+            <Button variant="outline" onClick={() => setShowWellnessActivities(false)}>
+              Cancel
+            </Button>
+            <Button onClick={() => navigate('/wellness')}>
+              Explore More
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { BreathingTimer } from "@/components/wellness/BreathingTimer";
+import { MeditationTimer } from "@/components/wellness/MeditationTimer";
 import { MoodJournal } from "@/components/wellness/MoodJournal";
 import { WellnessChallenges } from "@/components/wellness/WellnessChallenges";
 import {
@@ -20,6 +21,8 @@ import { useEffect, useState } from "react";
 interface WellnessStats {
   breathingSessions: number;
   breathingMinutes: number;
+  meditationSessions: number;
+  meditationMinutes: number;
   journalEntries: number;
   journalWords: number;
   currentStreak: number;
@@ -31,6 +34,8 @@ export default function Wellness() {
   const [stats, setStats] = useState<WellnessStats>({
     breathingSessions: 0,
     breathingMinutes: 0,
+    meditationSessions: 0,
+    meditationMinutes: 0,
     journalEntries: 0,
     journalWords: 0,
     currentStreak: 0,
@@ -42,16 +47,22 @@ export default function Wellness() {
     const breathingSessions = parseInt(localStorage.getItem('breathing-sessions') || '0');
     const breathingMinutes = parseInt(localStorage.getItem('breathing-minutes') || '0');
     
+    const meditationStats = JSON.parse(localStorage.getItem('meditation-stats') || '{"totalSessions": 0, "totalMinutes": 0}');
+    const meditationSessions = meditationStats.totalSessions || 0;
+    const meditationMinutes = meditationStats.totalMinutes || 0;
+    
     const journalEntries = JSON.parse(localStorage.getItem('mood-journal-entries') || '[]');
     const journalWords = journalEntries.reduce((total: number, entry: any) => total + (entry.wordCount || 0), 0);
     
     // Calculate streak (simplified - could be more sophisticated)
-    const totalDays = Math.max(breathingSessions, journalEntries.length);
+    const totalDays = Math.max(breathingSessions, meditationSessions, journalEntries.length);
     const currentStreak = Math.min(totalDays, 7); // Simplified streak calculation
     
     setStats({
       breathingSessions,
       breathingMinutes,
+      meditationSessions,
+      meditationMinutes,
       journalEntries: journalEntries.length,
       journalWords,
       currentStreak,
@@ -72,11 +83,22 @@ export default function Wellness() {
       ]
     },
     {
+      id: "meditation",
+      title: "Meditation Timer",
+      description: "Guided meditation sessions for mindfulness and inner peace",
+      icon: <Brain className="w-6 h-6" />,
+      color: "from-purple-500 to-violet-500",
+      stats: [
+        { label: "Sessions", value: stats.meditationSessions, icon: <Clock className="w-4 h-4" /> },
+        { label: "Minutes", value: stats.meditationMinutes, icon: <Target className="w-4 h-4" /> }
+      ]
+    },
+    {
       id: "journal",
       title: "Mood Journal",
       description: "Reflect on your thoughts and feelings with AI insights",
       icon: <BookOpen className="w-6 h-6" />,
-      color: "from-purple-500 to-violet-500",
+      color: "from-green-500 to-emerald-500",
       stats: [
         { label: "Entries", value: stats.journalEntries, icon: <MessageSquare className="w-4 h-4" /> },
         { label: "Words", value: stats.journalWords, icon: <Brain className="w-4 h-4" /> }
@@ -85,25 +107,25 @@ export default function Wellness() {
   ];
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto px-4 py-8">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto px-4 py-4 sm:py-8">
       {/* Header Section */}
       <div className="text-center space-y-4">
-        <div className="flex items-center justify-center gap-3 mb-6">
-          <div className="w-16 h-16 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white text-2xl">
-            <Heart className="w-8 h-8" />
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-4 sm:mb-6">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white text-xl sm:text-2xl">
+            <Heart className="w-6 h-6 sm:w-8 sm:h-8" />
           </div>
           <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
               Wellness Center
             </h1>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-base sm:text-lg text-muted-foreground">
               Your comprehensive mental wellness toolkit
             </p>
           </div>
         </div>
         
         {/* Wellness Stats Overview */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-4xl mx-auto">
           <Card className="border-none shadow-md bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
@@ -111,7 +133,7 @@ export default function Wellness() {
                 <span className="text-sm font-medium">Total Sessions</span>
               </div>
               <div className="text-2xl font-bold text-green-600">
-                {stats.breathingSessions + stats.journalEntries}
+                {stats.breathingSessions + stats.meditationSessions + stats.journalEntries}
               </div>
             </CardContent>
           </Card>
@@ -120,10 +142,10 @@ export default function Wellness() {
             <CardContent className="p-4 text-center">
               <div className="flex items-center justify-center gap-2 mb-2">
                 <Target className="w-4 h-4 text-blue-600" />
-                <span className="text-sm font-medium">Breathing Time</span>
+                <span className="text-sm font-medium">Wellness Time</span>
               </div>
               <div className="text-2xl font-bold text-blue-600">
-                {stats.breathingMinutes}m
+                {stats.breathingMinutes + stats.meditationMinutes}m
               </div>
             </CardContent>
           </Card>
@@ -155,20 +177,20 @@ export default function Wellness() {
       </div>
 
       {/* Feature Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
         {wellnessFeatures.map((feature) => (
           <Card 
             key={feature.id}
             className="border-none shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
             onClick={() => setActiveTab(feature.id)}
           >
-            <CardContent className="p-6">
-              <div className={`w-16 h-16 bg-gradient-to-br ${feature.color} rounded-full flex items-center justify-center text-white mb-4`}>
+            <CardContent className="p-4 sm:p-6">
+              <div className={`w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br ${feature.color} rounded-full flex items-center justify-center text-white mb-3 sm:mb-4`}>
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
-              <p className="text-muted-foreground mb-4">{feature.description}</p>
-              <div className="flex gap-4">
+              <h3 className="text-lg sm:text-xl font-bold mb-2">{feature.title}</h3>
+              <p className="text-sm sm:text-base text-muted-foreground mb-3 sm:mb-4">{feature.description}</p>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                 {feature.stats.map((stat, index) => (
                   <div key={index} className="flex items-center gap-2">
                     {stat.icon}
@@ -188,10 +210,14 @@ export default function Wellness() {
       <Card className="border-none shadow-xl">
         <CardHeader>
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
+            <TabsList className="grid w-full grid-cols-4">
               <TabsTrigger value="breathing" className="flex items-center gap-2">
                 <Wind className="w-4 h-4" />
                 Breathing
+              </TabsTrigger>
+              <TabsTrigger value="meditation" className="flex items-center gap-2">
+                <Brain className="w-4 h-4" />
+                Meditation
               </TabsTrigger>
               <TabsTrigger value="journal" className="flex items-center gap-2">
                 <BookOpen className="w-4 h-4" />
@@ -204,41 +230,18 @@ export default function Wellness() {
             </TabsList>
           </Tabs>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-6">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsContent value="breathing" className="space-y-6">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-primary mb-2">
-                  Mindful Breathing Exercises
-                </h2>
-                <p className="text-muted-foreground">
-                  Choose from various breathing techniques to reduce stress and improve focus
-                </p>
-              </div>
+            <TabsContent value="breathing" className="space-y-4">
               <BreathingTimer />
             </TabsContent>
-            
-            <TabsContent value="journal" className="space-y-6">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-primary mb-2">
-                  Mood Journal
-                </h2>
-                <p className="text-muted-foreground">
-                  Reflect on your thoughts, feelings, and experiences with guided prompts
-                </p>
-              </div>
+            <TabsContent value="meditation" className="space-y-4">
+              <MeditationTimer />
+            </TabsContent>
+            <TabsContent value="journal" className="space-y-4">
               <MoodJournal />
             </TabsContent>
-
-            <TabsContent value="challenges" className="space-y-6">
-              <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold text-primary mb-2">
-                  Wellness Challenges
-                </h2>
-                <p className="text-muted-foreground">
-                  Complete daily and weekly challenges to build healthy habits and earn achievements
-                </p>
-              </div>
+            <TabsContent value="challenges" className="space-y-4">
               <WellnessChallenges />
             </TabsContent>
           </Tabs>

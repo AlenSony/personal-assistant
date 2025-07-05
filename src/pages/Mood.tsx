@@ -264,19 +264,19 @@ export default function Mood() {
 
 
   return (
-    <div className="space-y-16 max-w-5xl mx-auto px-4 py-8">
+    <div className="space-y-8 md:space-y-16 max-w-5xl mx-auto px-4 py-4 md:py-8">
       {/* Header Section */}
-      <div className="flex items-center gap-6 mb-12">
+      <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-8 sm:mb-12">
         <img 
           src={orbitAvatar} 
           alt="Orbit" 
-          className="w-20 h-20 rounded-full shadow-lg"
+          className="w-16 h-16 sm:w-20 sm:h-20 rounded-full shadow-lg"
         />
-        <div>
-          <h1 className="text-5xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
+        <div className="text-center sm:text-left">
+          <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
             Mental Wellness
           </h1>
-          <p className="text-xl text-muted-foreground mt-3">
+          <p className="text-base sm:text-lg md:text-xl text-muted-foreground mt-2 sm:mt-3">
             Your emotional wellbeing matters. Let's check in with yourself 🤗
           </p>
         </div>
@@ -285,8 +285,8 @@ export default function Mood() {
       {/* Mood Check-in */}
       <Card className="border-none shadow-xl bg-gradient-to-br from-primary/5 to-accent/5 dark:from-primary/10 dark:to-accent/10">
         <CardHeader className="pb-6">
-          <CardTitle className="text-2xl text-foreground flex items-center gap-3">
-            <Heart className="w-6 h-6 text-primary" />
+          <CardTitle className="text-xl sm:text-2xl text-foreground flex items-center gap-3">
+            <Heart className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
             How are you feeling right now?
           </CardTitle>
         </CardHeader>
@@ -298,18 +298,18 @@ export default function Mood() {
       {/* Daily Affirmation */}
       <Card className={`border-none shadow-xl ${getMoodBasedCardBackground()}`}>
         <CardHeader className="pb-6">
-          <CardTitle className="flex items-center justify-between text-xl">
+          <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-lg sm:text-xl gap-3">
             <span className="flex items-center gap-2">
-              <Sparkles className="w-5 h-5 text-primary" />
+              <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-primary" />
               {getMoodTitle()}
             </span>
-            <Button onClick={getNewAffirmation} variant="outline" size="sm" className="hover:scale-105 transition-transform">
+            <Button onClick={getNewAffirmation} variant="outline" size="sm" className="hover:scale-105 transition-transform w-full sm:w-auto">
               New One
             </Button>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className={`text-center p-10 bg-gradient-to-r ${getMoodBasedStyling()} rounded-xl border border-border/50 relative overflow-hidden`}>
+          <div className={`text-center p-6 sm:p-10 bg-gradient-to-r ${getMoodBasedStyling()} rounded-xl border border-border/50 relative overflow-hidden`}>
             {/* Mood-specific decorative elements */}
             {currentMood && (
               <div className="absolute inset-0 opacity-10">
@@ -322,7 +322,7 @@ export default function Mood() {
             
             {/* Main content */}
             <div className="relative z-10">
-              <p className="text-xl font-medium text-foreground leading-relaxed">
+              <p className="text-lg sm:text-xl font-medium text-foreground leading-relaxed">
                 {getCurrentAffirmation()}
               </p>
               {currentMood && (
@@ -341,16 +341,16 @@ export default function Mood() {
       {/* Breathing Exercise */}
       <Card className="border-none shadow-xl bg-gradient-to-br from-slate-50 to-blue-50 dark:from-slate-900/50 dark:to-blue-900/20">
         <CardHeader className="pb-6">
-          <CardTitle className="flex items-center justify-between text-xl">
+          <CardTitle className="flex flex-col sm:flex-row items-start sm:items-center justify-between text-lg sm:text-xl gap-3">
             <span className="flex items-center gap-2">
-              <Wind className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+              <Wind className="w-4 h-4 sm:w-5 sm:h-5 text-blue-600 dark:text-blue-400" />
               Mindful Breathing Exercise 🧘‍♀️
             </span>
             <Button 
               onClick={() => setShowBreathing(!showBreathing)} 
               variant="outline" 
               size="sm"
-              className="hover:scale-105 transition-transform"
+              className="hover:scale-105 transition-transform w-full sm:w-auto"
             >
               {showBreathing ? 'Hide' : 'Show'}
             </Button>
@@ -358,9 +358,9 @@ export default function Mood() {
         </CardHeader>
         <CardContent>
           {!showBreathing ? (
-            <div className="text-center py-16">
-              <div className="text-7xl mb-8 animate-pulse">🫁</div>
-              <p className="text-xl text-muted-foreground">
+            <div className="text-center py-8 sm:py-16">
+              <div className="text-5xl sm:text-7xl mb-6 sm:mb-8 animate-pulse">🫁</div>
+              <p className="text-base sm:text-xl text-muted-foreground">
                 Take a moment to center yourself with guided breathing exercises
               </p>
             </div>
@@ -375,26 +375,26 @@ export default function Mood() {
       {/* Mood History */}
       <Card className="border-none shadow-xl bg-gradient-to-br from-slate-50 to-purple-50 dark:from-slate-900/50 dark:to-purple-900/20">
         <CardHeader className="pb-6">
-          <CardTitle className="text-xl flex items-center gap-2">
-            <BarChart className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+          <CardTitle className="text-lg sm:text-xl flex items-center gap-2">
+            <BarChart className="w-4 h-4 sm:w-5 sm:h-5 text-purple-600 dark:text-purple-400" />
             Recent Mood Patterns 📊
           </CardTitle>
         </CardHeader>
         <CardContent>
           {moodHistory.length === 0 ? (
-            <div className="text-center py-16">
-              <div className="text-6xl mb-8 animate-bounce">📈</div>
-              <p className="text-xl text-muted-foreground mb-6">
+            <div className="text-center py-8 sm:py-16">
+              <div className="text-4xl sm:text-6xl mb-6 sm:mb-8 animate-bounce">📈</div>
+              <p className="text-base sm:text-xl text-muted-foreground mb-4 sm:mb-6">
                 Mood tracking history will appear here as you use the app
               </p>
-              <p className="text-base text-muted-foreground bg-background/80 dark:bg-background/20 px-6 py-3 rounded-full inline-block border border-border/50">
+              <p className="text-sm sm:text-base text-muted-foreground bg-background/80 dark:bg-background/20 px-4 sm:px-6 py-2 sm:py-3 rounded-full inline-block border border-border/50">
                 Regular check-ins help identify patterns and celebrate progress!
               </p>
             </div>
           ) : (
             <div className="space-y-8">
               {/* Summary Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 <div className="bg-background/80 dark:bg-background/20 rounded-xl p-4 border border-border/50">
                   <div className="flex items-center gap-2 mb-2">
                     <Calendar className="w-4 h-4 text-blue-600 dark:text-blue-400" />

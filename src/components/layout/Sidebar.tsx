@@ -1,9 +1,12 @@
-import orbitAvatar from "@/assets/orbit-avatar.png";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Switch } from "@/components/ui/switch";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
-import { Heart, History, Home, List, Settings as SettingsIcon, Smile } from "lucide-react";
-import { NavLink } from "react-router-dom";
+import { BarChart3, CheckSquare, ChevronDown, Heart, History, Home, List, Moon, Settings as SettingsIcon, Smile, Sparkles, Sun, Target } from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   collapsed: boolean;
@@ -13,97 +16,245 @@ interface SidebarProps {
 const navigationItems = [
   { to: "/", icon: Home, label: "Dashboard", end: true },
   { to: "/tasks", icon: List, label: "Tasks" },
+  { to: "/goals", icon: Target, label: "Goals" },
   { to: "/mood", icon: Smile, label: "Mood" },
   { to: "/wellness", icon: Heart, label: "Wellness" },
+  { to: "/analytics", icon: BarChart3, label: "Analytics" },
   { to: "/history", icon: History, label: "History" },
   { to: "/settings", icon: SettingsIcon, label: "Settings" },
 ];
 
 export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const { theme, setTheme } = useTheme();
+  const isMobile = useIsMobile();
+
+  const menuItems = [
+    {
+      title: "Dashboard",
+      icon: Home,
+      href: "/",
+      description: "Your daily overview"
+    },
+    {
+      title: "Tasks",
+      icon: CheckSquare,
+      href: "/tasks",
+      description: "Manage your tasks"
+    },
+    {
+      title: "Mood",
+      icon: Heart,
+      href: "/mood",
+      description: "Track your emotions"
+    },
+    {
+      title: "Wellness",
+      icon: Sparkles,
+      href: "/wellness",
+      description: "Mindfulness & health"
+    },
+    {
+      title: "Goals",
+      icon: Target,
+      href: "/goals",
+      description: "Set & track goals"
+    },
+    {
+      title: "Analytics",
+      icon: BarChart3,
+      href: "/analytics",
+      description: "View insights"
+    },
+    {
+      title: "History",
+      icon: History,
+      href: "/history",
+      description: "Past activities"
+    },
+    {
+      title: "Settings",
+      icon: SettingsIcon,
+      href: "/settings",
+      description: "App preferences"
+    }
+  ];
+
   return (
-    <div
-      className={cn(
-        "fixed left-0 top-0 h-screen bg-card border-r border-border transition-all duration-300 ease-in-out z-50",
-        collapsed ? "w-16" : "w-64",
-        "md:block",
-        collapsed && "hidden md:block"
-      )}
-    >
-      {/* Header */}
-      <div className="p-4 border-b border-border">
-        <div className="flex items-center gap-3">
-          <img 
-            src={orbitAvatar} 
-            alt="Orbit Avatar" 
-            className="w-8 h-8 rounded-full"
-          />
+    <div className="flex h-full">
+      <div className={cn(
+        "flex flex-col bg-card border-r border-border shadow-lg transition-all duration-300 ease-in-out",
+        collapsed ? "w-16" : "w-64"
+      )}>
+        {/* Enhanced Header */}
+        <div className={cn("border-b border-border", collapsed ? "p-2" : "p-6")}>
+          <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3 mb-6")}>
+            <div className="relative">
+              <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+                O
+              </div>
+              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse"></div>
+            </div>
+            {!collapsed && (
+              <div>
+                <h1 className="text-xl font-bold gradient-text">Orbit Flow</h1>
+                <p className="text-xs text-muted-foreground">Mind & Productivity</p>
+              </div>
+            )}
+          </div>
+          
+          {/* User Profile Section */}
           {!collapsed && (
-            <div>
-              <h1 className="font-bold text-lg text-foreground">Orbit</h1>
-              <p className="text-xs text-muted-foreground">Your AI companion</p>
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors cursor-pointer">
+              <Avatar className="w-10 h-10 border-2 border-primary/20">
+                <AvatarImage src="/orbit-avatar.png" alt="User" />
+                <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white">
+                  U
+                </AvatarFallback>
+              </Avatar>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">Welcome back!</p>
+                <p className="text-xs text-muted-foreground truncate">Ready to flow?</p>
+              </div>
+              <ChevronDown className="w-4 h-4 text-muted-foreground" />
             </div>
           )}
         </div>
-        
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onToggle}
-          className="absolute top-4 right-2 w-6 h-6 p-0"
-        >
-          <span className="sr-only">Toggle sidebar</span>
-          {collapsed ? "→" : "←"}
-        </Button>
-      </div>
 
-      {/* Navigation */}
-      <nav className="p-2 space-y-1">
-        {navigationItems.map((item) => {
-          const IconComponent = item.icon;
-          return (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                cn(
-                  "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors",
-                  "hover:bg-secondary/50",
-                  isActive
-                    ? "bg-primary text-primary-foreground shadow-sm"
-                    : "text-muted-foreground hover:text-foreground"
-                )
-              }
-            >
-              <IconComponent className="w-5 h-5 flex-shrink-0" />
-              {!collapsed && <span className="font-medium">{item.label}</span>}
-            </NavLink>
-          );
-        })}
-      </nav>
+        {/* Navigation Menu */}
+        <nav className={cn("flex-1 space-y-2", collapsed ? "p-2" : "p-4")}>
+          {menuItems.map((item) => {
+            const isActive = location.pathname === item.href;
+            const Icon = item.icon;
+            
+            return (
+              <TooltipProvider key={item.href}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      onClick={() => navigate(item.href)}
+                      className={cn(
+                        "w-full flex items-center rounded-xl text-left transition-all duration-200 group relative overflow-hidden",
+                        collapsed ? "justify-center px-2 py-3" : "gap-3 px-4 py-3",
+                        isActive 
+                          ? "bg-gradient-to-r from-primary/10 to-primary/5 text-primary border border-primary/20 shadow-sm" 
+                          : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      )}
+                    >
+                      {/* Active indicator */}
+                      {isActive && (
+                        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-purple-600 rounded-r-full"></div>
+                      )}
+                      
+                      {/* Icon with enhanced styling */}
+                      <div className={cn(
+                        "w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-200",
+                        isActive 
+                          ? "bg-primary text-primary-foreground shadow-md" 
+                          : "bg-muted/50 group-hover:bg-primary/10 group-hover:text-primary"
+                      )}>
+                        <Icon className="w-4 h-4" />
+                      </div>
+                      
+                      {/* Text content */}
+                      {!collapsed && (
+                        <div className="flex-1 min-w-0">
+                          <p className={cn(
+                            "font-medium transition-colors",
+                            isActive ? "text-primary" : "group-hover:text-foreground"
+                          )}>
+                            {item.title}
+                          </p>
+                          <p className="text-xs text-muted-foreground truncate">
+                            {item.description}
+                          </p>
+                        </div>
+                      )}
+                      
+                      {/* Hover effect */}
+                      <div className={cn(
+                        "absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 transition-opacity duration-200",
+                        "group-hover:opacity-100"
+                      )} />
+                    </button>
+                  </TooltipTrigger>
+                  {collapsed && (
+                    <TooltipContent side="right" className="tooltip-content">
+                      <p>{item.description}</p>
+                    </TooltipContent>
+                  )}
+                </Tooltip>
+              </TooltipProvider>
+            );
+          })}
+        </nav>
 
-      {/* Footer */}
-      {!collapsed && (
-        <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-3">
-          <div className="p-3 bg-primary-soft rounded-lg">
-            <p className="text-xs text-primary font-medium">
-              ✨ Ready to help you stay organized and calm
-            </p>
+        {/* Enhanced Footer */}
+        <div className={cn("border-t border-border space-y-4", collapsed ? "p-2" : "p-4")}>
+          {/* Theme Toggle */}
+          <div className={cn("flex items-center rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors", collapsed ? "justify-center p-2" : "justify-between p-3")}>
+            <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
+              <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
+                {theme === 'dark' ? (
+                  <Moon className="w-4 h-4 text-yellow-500" />
+                ) : (
+                  <Sun className="w-4 h-4 text-orange-500" />
+                )}
+              </div>
+              {!collapsed && (
+                <div>
+                  <p className="text-sm font-medium">Theme</p>
+                  <p className="text-xs text-muted-foreground capitalize">{theme}</p>
+                </div>
+              )}
+            </div>
+            {!collapsed && (
+              <Switch
+                checked={theme === 'dark'}
+                onCheckedChange={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                className="data-[state=checked]:bg-primary"
+              />
+            )}
           </div>
-          <div className="flex justify-center mt-2">
-            <ThemeToggle />
-          </div>
+
+          {/* Quick Actions */}
+          {!collapsed && (
+            <div className="grid grid-cols-2 gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-9 text-xs"
+                onClick={() => navigate('/mood')}
+              >
+                <Heart className="w-3 h-3 mr-1" />
+                Mood
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="h-9 text-xs"
+                onClick={() => navigate('/wellness')}
+              >
+                <Sparkles className="w-3 h-3 mr-1" />
+                Wellness
+              </Button>
+            </div>
+          )}
+
+          {/* App Version */}
+          {!collapsed && (
+            <div className="text-center">
+              <p className="text-xs text-muted-foreground">
+                Orbit Flow v1.0.0
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Made with ❤️ for your mind
+              </p>
+            </div>
+          )}
         </div>
-      )}
-
-      {/* Mobile overlay backdrop */}
-      {!collapsed && (
-        <div
-          className="fixed inset-0 bg-black/30 z-40 md:hidden"
-          onClick={onToggle}
-          aria-label="Close sidebar overlay"
-        />
-      )}
+      </div>
     </div>
   );
 }

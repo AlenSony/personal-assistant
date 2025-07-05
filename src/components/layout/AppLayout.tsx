@@ -29,10 +29,11 @@ export function AppLayout() {
         <main 
           className={cn(
             "flex-1 transition-all duration-300 ease-in-out",
-            sidebarCollapsed ? "ml-16" : "ml-64"
+            sidebarCollapsed ? "ml-16" : "ml-64",
+            "md:ml-0" // On mobile, sidebar is overlay
           )}
         >
-          <div className="p-6">
+          <div className="p-4 md:p-6">
             <Outlet />
           </div>
         </main>

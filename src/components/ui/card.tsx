@@ -4,12 +4,21 @@ import { cn } from "@/lib/utils"
 
 const Card = React.forwardRef<
   HTMLDivElement,
-  React.HTMLAttributes<HTMLDivElement>
->(({ className, ...props }, ref) => (
+  React.HTMLAttributes<HTMLDivElement> & {
+    hover?: boolean
+    glass?: boolean
+    gradient?: boolean
+    animated?: boolean
+  }
+>(({ className, hover = false, glass = false, gradient = false, animated = false, ...props }, ref) => (
   <div
     ref={ref}
     className={cn(
-      "rounded-lg border bg-card text-card-foreground shadow-sm",
+      "rounded-xl border bg-card text-card-foreground shadow-sm",
+      hover && "transition-all duration-300 hover:shadow-xl hover:scale-[1.02] hover:-translate-y-1",
+      glass && "backdrop-blur-md bg-glass-bg border-glass-border shadow-glass-shadow",
+      gradient && "bg-gradient-to-br from-card via-card/95 to-card/90",
+      animated && "animate-fade-in",
       className
     )}
     {...props}
@@ -76,4 +85,5 @@ const CardFooter = React.forwardRef<
 ))
 CardFooter.displayName = "CardFooter"
 
-export { Card, CardHeader, CardFooter, CardTitle, CardDescription, CardContent }
+export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
+

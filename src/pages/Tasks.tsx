@@ -11,6 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { historyService, type TaskEntry } from "@/services/history-service";
+import { notificationService } from "@/services/notification-service";
 import { format, isPast, isToday, isTomorrow } from "date-fns";
 import {
     BarChart3,
@@ -87,17 +88,8 @@ export default function Tasks() {
 
   // Request notification permission
   const requestNotificationPermission = async () => {
-    if (!('Notification' in window)) {
-      toast({
-        title: "Notifications not supported",
-        description: "Your browser doesn't support notifications.",
-        variant: "destructive",
-      });
-      return;
-    }
-
     try {
-      const permission = await Notification.requestPermission();
+      const permission = await notificationService.requestPermission();
       setNotificationPermission(permission);
       setNotificationsEnabled(permission === 'granted');
       
@@ -126,41 +118,7 @@ export default function Tasks() {
   // Schedule notification for a task
   const scheduleNotification = (task: Task) => {
     if (!notificationsEnabled || !task.dueDate || !task.dueTime) return;
-
-    const [hours, minutes] = task.dueTime.split(':').map(Number);
-    const dueDateTime = new Date(task.dueDate);
-    dueDateTime.setHours(hours, minutes, 0, 0);
-
-    // Don't schedule if the time has already passed
-    if (dueDateTime <= new Date()) return;
-
-    // Calculate delay in milliseconds
-    const delay = dueDateTime.getTime() - Date.now();
-
-    // Schedule notification
-    setTimeout(() => {
-      if (Notification.permission === 'granted') {
-        const notification = new Notification('Task Reminder', {
-          body: `${task.title} is due now!`,
-          icon: '/favicon.ico',
-          badge: '/favicon.ico',
-          tag: `task-${task.id}`,
-          requireInteraction: true,
-        });
-
-        // Handle notification click
-        notification.onclick = () => {
-          window.focus();
-          notification.close();
-          // You could add logic here to navigate to the task or mark it complete
-        };
-
-        // Auto-close notification after 30 seconds
-        setTimeout(() => {
-          notification.close();
-        }, 30000);
-      }
-    }, delay);
+    notificationService.scheduleTaskReminder(task);
   };
 
   // Schedule notifications for all tasks with due times
@@ -318,16 +276,16 @@ export default function Tasks() {
     <div className="space-y-6">
       {/* Header */}
       <div className="space-y-2">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold text-foreground">Task Organizer</h1>
-            <p className="text-muted-foreground">
+            <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Task Organizer</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Manage your tasks with smart prioritization and natural language input 📝
             </p>
           </div>
           <Button
             onClick={() => setShowEmailGenerator(true)}
-            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+            className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 w-full sm:w-auto"
           >
             <Mail className="w-4 h-4 mr-2" />
             AI Email Generator
@@ -346,7 +304,7 @@ export default function Tasks() {
       </Card>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
         <Card className="border-none shadow-md bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30">
           <CardContent className="p-4">
             <div className="flex items-center justify-between">
@@ -457,7 +415,7 @@ export default function Tasks() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 md:gap-4">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
