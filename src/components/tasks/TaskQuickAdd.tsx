@@ -172,11 +172,19 @@ export function TaskQuickAdd({ onTaskAdd }: { onTaskAdd?: (task: any) => void })
         finalTask.category
       );
       
+      console.log('Email detection debug:', {
+        title: finalTask.title,
+        description: finalTask.description,
+        category: finalTask.category,
+        requiresEmail
+      });
+      
       if (requiresEmail) {
         const emailPurpose = determineEmailPurpose(finalTask.title, finalTask.description || '');
         const suggestedRecipient = suggestRecipient(finalTask.title, finalTask.description || '', finalTask.category);
         
-        const suggestion = generateEmailSuggestion({
+        // Generate email suggestion asynchronously
+        generateEmailSuggestion({
           taskTitle: finalTask.title,
           taskDescription: finalTask.description || '',
           category: finalTask.category,
@@ -184,14 +192,20 @@ export function TaskQuickAdd({ onTaskAdd }: { onTaskAdd?: (task: any) => void })
           dueDate: finalTask.dueDate?.toISOString().split('T')[0],
           recipient: suggestedRecipient,
           purpose: emailPurpose
-        });
-        
-        setEmailSuggestion(suggestion);
-        setShowEmailSuggestion(true);
-        
-        toast({
-          title: "Task added! 📧",
-          description: `"${taskInput}" has been added. Email suggestion generated!`,
+        }).then(suggestion => {
+          setEmailSuggestion(suggestion);
+          setShowEmailSuggestion(true);
+          
+          toast({
+            title: "Task added! 📧",
+            description: `"${taskInput}" has been added. Email suggestion generated!`,
+          });
+        }).catch(error => {
+          console.error('Error generating email suggestion:', error);
+          toast({
+            title: "Task added! 🎉",
+            description: `"${taskInput}" has been added to your ${finalTask.category} tasks.`,
+          });
         });
       } else {
         toast({

@@ -234,6 +234,15 @@ export function detectEmailRequirement(taskTitle: string, taskDescription: strin
     category.toLowerCase().includes(emailCat.toLowerCase())
   );
   
+  console.log('Email detection details:', {
+    text,
+    category,
+    hasEmailKeywords,
+    hasEmailCategory,
+    matchingKeywords: emailKeywords.filter(keyword => text.includes(keyword.toLowerCase())),
+    matchingCategories: emailCategories.filter(emailCat => category.toLowerCase().includes(emailCat.toLowerCase()))
+  });
+  
   return hasEmailKeywords || hasEmailCategory;
 }
 
