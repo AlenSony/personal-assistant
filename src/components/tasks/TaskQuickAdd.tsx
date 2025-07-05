@@ -7,10 +7,17 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "@/hooks/use-toast";
 import { cn } from "@/lib/utils";
+import {
+    detectEmailRequirement,
+    determineEmailPurpose,
+    generateEmailSuggestion,
+    suggestRecipient
+} from "@/services/email-generator";
 import { historyService, type TaskEntry } from "@/services/history-service";
 import { format } from "date-fns";
 import { CalendarIcon, Clock3, Plus, Sparkles } from "lucide-react";
 import { useState } from "react";
+import { EmailSuggestionCard } from "./EmailSuggestion";
 
 interface TaskData {
   title: string;
@@ -28,6 +35,8 @@ export function TaskQuickAdd({ onTaskAdd }: { onTaskAdd?: (task: any) => void })
   const [taskInput, setTaskInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [emailSuggestion, setEmailSuggestion] = useState<any>(null);
+  const [showEmailSuggestion, setShowEmailSuggestion] = useState(false);
   const [taskData, setTaskData] = useState<TaskData>({
     title: "",
     category: "personal",
@@ -52,6 +61,9 @@ export function TaskQuickAdd({ onTaskAdd }: { onTaskAdd?: (task: any) => void })
     { text: "Review emails", category: "work", priority: "high" },
     { text: "Team meeting", category: "work", priority: "high", isMeeting: true },
     { text: "Doctor appointment", category: "health", priority: "medium", isMeeting: true },
+    { text: "Follow up with client", category: "work", priority: "high" },
+    { text: "Send project update", category: "work", priority: "medium" },
+    { text: "Request meeting with manager", category: "work", priority: "medium" },
   ];
 
   // Generate time options for the time picker
@@ -153,10 +165,40 @@ export function TaskQuickAdd({ onTaskAdd }: { onTaskAdd?: (task: any) => void })
       // Save to history service
       historyService.saveTaskToStorage(newTask);
       
-      toast({
-        title: "Task added! 🎉",
-        description: `"${taskInput}" has been added to your ${finalTask.category} tasks.`,
-      });
+      // Check if email is required
+      const requiresEmail = detectEmailRequirement(
+        finalTask.title, 
+        finalTask.description || '', 
+        finalTask.category
+      );
+      
+      if (requiresEmail) {
+        const emailPurpose = determineEmailPurpose(finalTask.title, finalTask.description || '');
+        const suggestedRecipient = suggestRecipient(finalTask.title, finalTask.description || '', finalTask.category);
+        
+        const suggestion = generateEmailSuggestion({
+          taskTitle: finalTask.title,
+          taskDescription: finalTask.description || '',
+          category: finalTask.category,
+          priority: finalTask.priority,
+          dueDate: finalTask.dueDate?.toISOString().split('T')[0],
+          recipient: suggestedRecipient,
+          purpose: emailPurpose
+        });
+        
+        setEmailSuggestion(suggestion);
+        setShowEmailSuggestion(true);
+        
+        toast({
+          title: "Task added! 📧",
+          description: `"${taskInput}" has been added. Email suggestion generated!`,
+        });
+      } else {
+        toast({
+          title: "Task added! 🎉",
+          description: `"${taskInput}" has been added to your ${finalTask.category} tasks.`,
+        });
+      }
       
       if (onTaskAdd) {
         onTaskAdd(newTask);
@@ -408,7 +450,27 @@ export function TaskQuickAdd({ onTaskAdd }: { onTaskAdd?: (task: any) => void })
         <p>💡 Try natural language like "Call mom tomorrow" or "Buy groceries Friday (urgent)"</p>
         <p>✨ AI automatically detects priority, category, and due dates from your text</p>
         <p>🕐 For meetings, try "Team meeting at 3 PM tomorrow" or "Doctor appointment Friday 2:30 PM"</p>
+        <p>📧 Tasks with email keywords will automatically generate email suggestions</p>
       </div>
+
+      {/* Email Suggestion */}
+      {showEmailSuggestion && emailSuggestion && (
+        <div className="mt-6">
+          <EmailSuggestionCard
+            suggestion={emailSuggestion}
+            taskTitle={taskInput}
+            onClose={() => setShowEmailSuggestion(false)}
+            onSend={(emailData) => {
+              // Handle email sending (could integrate with email service)
+              toast({
+                title: "Email ready! 📧",
+                description: `Email prepared for ${emailData.to}`,
+              });
+              setShowEmailSuggestion(false);
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
