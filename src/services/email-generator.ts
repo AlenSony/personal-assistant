@@ -291,20 +291,21 @@ Due Date: ${context.dueDate || 'No due date'}
 Recipient: ${context.recipient || 'Recipient'}
 Purpose: ${context.purpose}
 
-Please generate:
-1. A professional subject line
-2. A well-written email body with appropriate tone
-3. The tone should be: ${context.priority === 'high' ? 'formal and urgent' : 'professional and friendly'}
+Please generate a professional email that:
+1. Uses the task context to create relevant and specific content
+2. Adapts the tone based on priority (${context.priority === 'high' ? 'formal and urgent' : 'professional and friendly'})
+3. Includes specific details from the task description
+4. Makes the email actionable and clear
 
 Requirements:
-- Keep the subject line concise and professional
-- Make the email body clear, concise, and actionable
-- Use appropriate greeting and closing
-- Include relevant context from the task
-- If it's urgent (high priority), convey urgency appropriately
-- If there's a due date, mention it appropriately
-- Replace [Recipient Name] with the suggested recipient
-- Replace [Your Name] with a placeholder for the sender's name
+- Create a concise, professional subject line that reflects the task
+- Write an email body that incorporates the task context naturally
+- Use appropriate business language and tone
+- Include relevant details from the task description
+- Make it clear what action is needed or what information is being shared
+- If urgent (high priority), convey appropriate urgency
+- If there's a due date, mention it contextually
+- Use [Recipient Name] and [Your Name] as placeholders
 
 Please format your response as:
 SUBJECT: [subject line]

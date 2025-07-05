@@ -6,15 +6,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { type EmailSuggestion } from "@/services/email-generator";
 import {
-    AlertCircle,
-    Check,
-    Copy,
-    Edit,
-    Mail,
-    MessageSquare,
-    Send,
-    User,
-    X
+  AlertCircle,
+  Check,
+  Copy,
+  Edit,
+  Mail,
+  MessageSquare,
+  Sparkles,
+  User,
+  X
 } from "lucide-react";
 import { useState } from "react";
 
@@ -22,10 +22,9 @@ interface EmailSuggestionProps {
   suggestion: EmailSuggestion;
   taskTitle: string;
   onClose: () => void;
-  onSend?: (emailData: { to: string; subject: string; body: string }) => void;
 }
 
-export function EmailSuggestionCard({ suggestion, taskTitle, onClose, onSend }: EmailSuggestionProps) {
+export function EmailSuggestionCard({ suggestion, taskTitle, onClose }: EmailSuggestionProps) {
   const [recipient, setRecipient] = useState('');
   const [subject, setSubject] = useState(suggestion.subject);
   const [body, setBody] = useState(suggestion.body);
@@ -52,17 +51,6 @@ export function EmailSuggestionCard({ suggestion, taskTitle, onClose, onSend }: 
     }
   };
 
-  const handleSend = () => {
-    if (onSend && recipient.trim()) {
-      onSend({
-        to: recipient,
-        subject,
-        body
-      });
-      onClose();
-    }
-  };
-
   const getToneColor = (tone: string) => {
     switch (tone) {
       case 'formal': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
@@ -79,7 +67,7 @@ export function EmailSuggestionCard({ suggestion, taskTitle, onClose, onSend }: 
         <div className="flex items-center justify-between">
           <CardTitle className="flex items-center gap-2">
             <Mail className="w-5 h-5 text-blue-600" />
-            Email Suggestion
+            AI Email Generator
           </CardTitle>
           <div className="flex items-center gap-2">
             <Badge className={getToneColor(suggestion.tone)}>
@@ -91,7 +79,7 @@ export function EmailSuggestionCard({ suggestion, taskTitle, onClose, onSend }: 
           </div>
         </div>
         <p className="text-sm text-muted-foreground">
-          Generated for: {taskTitle}
+          Generated from: {taskTitle}
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -99,7 +87,7 @@ export function EmailSuggestionCard({ suggestion, taskTitle, onClose, onSend }: 
         <div className="bg-background/50 rounded-lg p-3 border border-border/50">
           <div className="flex items-center gap-2 mb-2">
             <AlertCircle className="w-4 h-4 text-blue-600" />
-            <span className="text-sm font-medium">Key Points</span>
+            <span className="text-sm font-medium">Context Summary</span>
           </div>
           <div className="space-y-1">
             {suggestion.keyPoints.map((point, index) => (
@@ -114,12 +102,11 @@ export function EmailSuggestionCard({ suggestion, taskTitle, onClose, onSend }: 
         <div className="space-y-2">
           <Label htmlFor="recipient" className="flex items-center gap-2">
             <User className="w-4 h-4" />
-            Recipient Email
+            Recipient Name
           </Label>
           <Input
             id="recipient"
-            type="email"
-            placeholder="recipient@example.com"
+            placeholder="Enter recipient name"
             value={recipient}
             onChange={(e) => setRecipient(e.target.value)}
           />
@@ -128,7 +115,7 @@ export function EmailSuggestionCard({ suggestion, taskTitle, onClose, onSend }: 
         {/* Subject */}
         <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <Label htmlFor="subject">Subject</Label>
+            <Label htmlFor="subject">Subject Line</Label>
             <Button
               variant="ghost"
               size="sm"
@@ -188,23 +175,15 @@ export function EmailSuggestionCard({ suggestion, taskTitle, onClose, onSend }: 
           )}
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex gap-2 pt-2">
+        {/* Copy All Button */}
+        <div className="pt-2">
           <Button
-            variant="outline"
             onClick={() => handleCopy('', 'all')}
-            className="flex-1"
+            className="w-full"
+            size="lg"
           >
             <Copy className="w-4 h-4 mr-2" />
-            Copy All
-          </Button>
-          <Button
-            onClick={handleSend}
-            disabled={!recipient.trim()}
-            className="flex-1"
-          >
-            <Send className="w-4 h-4 mr-2" />
-            Send Email
+            Copy Complete Email
           </Button>
         </div>
 
@@ -218,6 +197,17 @@ export function EmailSuggestionCard({ suggestion, taskTitle, onClose, onSend }: 
             <div>• Review and customize the email before sending</div>
             <div>• Replace [Recipient Name] and [Your Name] with actual names</div>
             <div>• Add any specific details or context as needed</div>
+            <div>• Use the edit button to modify the content</div>
+          </div>
+        </div>
+
+        {/* AI Generated Notice */}
+        <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3 border border-blue-200 dark:border-blue-800">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-blue-600" />
+            <span className="text-xs text-blue-700 dark:text-blue-300">
+              ✨ This email was generated by AI based on your task context
+            </span>
           </div>
         </div>
       </CardContent>

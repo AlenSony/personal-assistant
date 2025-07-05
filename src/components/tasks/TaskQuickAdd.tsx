@@ -474,14 +474,6 @@ export function TaskQuickAdd({ onTaskAdd }: { onTaskAdd?: (task: any) => void })
             suggestion={emailSuggestion}
             taskTitle={taskInput}
             onClose={() => setShowEmailSuggestion(false)}
-            onSend={(emailData) => {
-              // Handle email sending (could integrate with email service)
-              toast({
-                title: "Email ready! 📧",
-                description: `Email prepared for ${emailData.to}`,
-              });
-              setShowEmailSuggestion(false);
-            }}
           />
         </div>
       )}
