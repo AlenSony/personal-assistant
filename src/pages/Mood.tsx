@@ -2,8 +2,9 @@ import orbitAvatar from "@/assets/orbit-avatar.png";
 import { MoodChatbot } from "@/components/ai/MoodChatbot";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BreathingTimer } from "@/components/wellness/BreathingTimer";
 import { type MoodAnalysis } from "@/services/ai-service";
-import { BarChart, Calendar, Heart, Pause, Play, RotateCcw, Sparkles, Timer, TrendingUp, Wind } from "lucide-react";
+import { BarChart, Calendar, Heart, Sparkles, TrendingUp, Wind } from "lucide-react";
 import { useEffect, useState } from "react";
 
 // Mood-specific affirmations
@@ -102,44 +103,7 @@ const moodAffirmations = {
   ]
 };
 
-const breathingExercises = {
-  "4-7-8": {
-    title: "4-7-8 Breathing",
-    description: "Calms anxiety & promotes sleep",
-    icon: "🌙",
-    color: "from-purple-500 to-blue-500",
-    steps: [
-      { phase: "Inhale", duration: 4, instruction: "Inhale quietly through your nose" },
-      { phase: "Hold", duration: 7, instruction: "Hold your breath" },
-      { phase: "Exhale", duration: 8, instruction: "Exhale through your mouth" }
-    ],
-    cycles: 4
-  },
-  "Box Breathing": {
-    title: "Box Breathing",
-    description: "Navy SEAL technique for focus",
-    icon: "🎯",
-    color: "from-green-500 to-teal-500",
-    steps: [
-      { phase: "Inhale", duration: 4, instruction: "Inhale through your nose" },
-      { phase: "Hold", duration: 4, instruction: "Hold your breath" },
-      { phase: "Exhale", duration: 4, instruction: "Exhale through your mouth" },
-      { phase: "Hold", duration: 4, instruction: "Hold empty lungs" }
-    ],
-    cycles: 4
-  },
-  "Deep Breathing": {
-    title: "Deep Breathing",
-    description: "Reduces stress & increases oxygen",
-    icon: "🫁",
-    color: "from-orange-500 to-red-500",
-    steps: [
-      { phase: "Inhale", duration: 4, instruction: "Inhale deeply through your nose" },
-      { phase: "Exhale", duration: 6, instruction: "Exhale slowly through your mouth" }
-    ],
-    cycles: 6
-  }
-};
+
 
 // Mood history interface
 interface MoodEntry {
@@ -154,12 +118,7 @@ export default function Mood() {
   const [currentAffirmation, setCurrentAffirmation] = useState(0);
   const [showBreathing, setShowBreathing] = useState(false);
   const [currentMood, setCurrentMood] = useState<MoodAnalysis | null>(null);
-  const [selectedExercise, setSelectedExercise] = useState<keyof typeof breathingExercises>("4-7-8");
-  const [isBreathingActive, setIsBreathingActive] = useState(false);
-  const [currentStep, setCurrentStep] = useState(0);
-  const [timeLeft, setTimeLeft] = useState(0);
-  const [currentCycle, setCurrentCycle] = useState(1);
-  const [totalCycles, setTotalCycles] = useState(4);
+
   const [moodHistory, setMoodHistory] = useState<MoodEntry[]>([]);
 
   // Load mood history from localStorage on component mount
@@ -302,83 +261,7 @@ export default function Mood() {
   };
 
   // Breathing exercise logic
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (isBreathingActive && timeLeft > 0) {
-      interval = setInterval(() => {
-        setTimeLeft(prev => {
-          if (prev <= 1) {
-            // Move to next step
-            const exercise = breathingExercises[selectedExercise];
-            const nextStep = (currentStep + 1) % exercise.steps.length;
-            
-            if (nextStep === 0) {
-              // Completed a cycle
-              const nextCycle = currentCycle + 1;
-              if (nextCycle > totalCycles) {
-                // Exercise complete
-                setIsBreathingActive(false);
-                setCurrentStep(0);
-                setCurrentCycle(1);
-                setTimeLeft(0);
-                return 0;
-              } else {
-                setCurrentCycle(nextCycle);
-              }
-            }
-            
-            setCurrentStep(nextStep);
-            return exercise.steps[nextStep].duration;
-          }
-          return prev - 1;
-        });
-      }, 1000);
-    }
-    
-    return () => clearInterval(interval);
-  }, [isBreathingActive, timeLeft, currentStep, currentCycle, selectedExercise, totalCycles]);
 
-  const startBreathing = () => {
-    const exercise = breathingExercises[selectedExercise];
-    setTotalCycles(exercise.cycles);
-    setCurrentCycle(1);
-    setCurrentStep(0);
-    setTimeLeft(exercise.steps[0].duration);
-    setIsBreathingActive(true);
-  };
-
-  const pauseBreathing = () => {
-    setIsBreathingActive(false);
-  };
-
-  const resetBreathing = () => {
-    setIsBreathingActive(false);
-    setCurrentStep(0);
-    setCurrentCycle(1);
-    setTimeLeft(0);
-  };
-
-  const getBreathingVisual = () => {
-    const exercise = breathingExercises[selectedExercise];
-    const currentStepData = exercise.steps[currentStep];
-    
-    let visualSize = 1;
-    let visualColor = "bg-gradient-to-r from-primary to-primary/80";
-    
-    if (currentStepData.phase === "Inhale") {
-      visualSize = 1 + (currentStepData.duration - timeLeft) / currentStepData.duration * 0.6;
-      visualColor = "bg-gradient-to-r from-green-400 to-emerald-500";
-    } else if (currentStepData.phase === "Hold") {
-      visualSize = 1.6;
-      visualColor = "bg-gradient-to-r from-yellow-400 to-orange-500";
-    } else if (currentStepData.phase === "Exhale") {
-      visualSize = 1.6 - (currentStepData.duration - timeLeft) / currentStepData.duration * 0.6;
-      visualColor = "bg-gradient-to-r from-blue-400 to-indigo-500";
-    }
-    
-    return { size: visualSize, color: visualColor };
-  };
 
   return (
     <div className="space-y-16 max-w-5xl mx-auto px-4 py-8">
@@ -482,139 +365,8 @@ export default function Mood() {
               </p>
             </div>
           ) : (
-            <div className="space-y-12">
-              {/* Exercise Selection */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {Object.entries(breathingExercises).map(([key, exercise]) => (
-                  <Button
-                    key={key}
-                    variant={selectedExercise === key ? "default" : "outline"}
-                    onClick={() => setSelectedExercise(key as keyof typeof breathingExercises)}
-                    className={`h-auto p-6 flex flex-col items-center gap-3 transition-all duration-300 ${
-                      selectedExercise === key 
-                        ? 'bg-gradient-to-r ' + exercise.color + ' text-white shadow-lg scale-105' 
-                        : 'hover:scale-105 hover:shadow-md bg-background dark:bg-background'
-                    }`}
-                    disabled={isBreathingActive}
-                  >
-                    <span className="text-2xl">{exercise.icon}</span>
-                    <span className="font-semibold text-base">{exercise.title}</span>
-                    <span className="text-xs opacity-80 text-center leading-tight">{exercise.description}</span>
-                  </Button>
-                ))}
-              </div>
-
-              {/* Breathing Visual */}
-              <div className="flex justify-center py-8">
-                <div className="relative">
-                  {/* Outer glow ring */}
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-blue-400/20 to-purple-400/20 dark:from-blue-400/10 dark:to-purple-400/10 blur-xl animate-pulse"></div>
-                  
-                  {/* Main breathing circle */}
-                  <div 
-                    className={`w-36 h-36 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full flex items-center justify-center transition-all duration-1000 ease-in-out ${getBreathingVisual().color} shadow-2xl relative z-10`}
-                    style={{ 
-                      transform: `scale(${getBreathingVisual().size})`,
-                      opacity: isBreathingActive ? 1 : 0.4
-                    }}
-                  >
-                    <span className="text-white font-bold text-xl sm:text-2xl md:text-3xl">
-                      {isBreathingActive ? timeLeft : "Ready"}
-                    </span>
-                  </div>
-                  
-                  {/* Breathing rings */}
-                  {isBreathingActive && (
-                    <>
-                      <div className="absolute inset-0 rounded-full border-4 border-primary/20 animate-ping"></div>
-                      <div className="absolute inset-0 rounded-full border-2 border-primary/30 animate-pulse"></div>
-                    </>
-                  )}
-                </div>
-              </div>
-
-              {/* Current Phase Display */}
-              {isBreathingActive && (
-                <div className="text-center bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-xl p-6 border border-border/50">
-                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary mb-3">
-                    {breathingExercises[selectedExercise].steps[currentStep].phase}
-                  </div>
-                  <div className="text-base sm:text-lg md:text-xl text-muted-foreground mb-3">
-                    {breathingExercises[selectedExercise].steps[currentStep].instruction}
-                  </div>
-                  <div className="text-sm sm:text-base md:text-lg text-muted-foreground bg-background/80 dark:bg-background/20 px-4 py-2 rounded-full inline-block border border-border/50">
-                    Cycle {currentCycle} of {totalCycles}
-                  </div>
-                </div>
-              )}
-
-              {/* Controls */}
-              <div className="flex flex-col sm:flex-row justify-center gap-4">
-                {!isBreathingActive ? (
-                  <Button 
-                    onClick={startBreathing} 
-                    className="flex items-center justify-center gap-3 px-8 py-4 text-lg bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-lg hover:scale-105 transition-all duration-300"
-                  >
-                    <Play className="w-5 h-5" />
-                    Start Exercise
-                  </Button>
-                ) : (
-                  <>
-                    <Button 
-                      onClick={pauseBreathing} 
-                      variant="outline" 
-                      className="flex items-center justify-center gap-2 px-6 py-4 text-base hover:scale-105 transition-transform"
-                    >
-                      <Pause className="w-4 h-4" />
-                      Pause
-                    </Button>
-                    <Button 
-                      onClick={resetBreathing} 
-                      variant="outline" 
-                      className="flex items-center justify-center gap-2 px-6 py-4 text-base hover:scale-105 transition-transform"
-                    >
-                      <RotateCcw className="w-4 h-4" />
-                      Reset
-                    </Button>
-                  </>
-                )}
-              </div>
-
-              {/* Exercise Instructions */}
-              <div className="bg-gradient-to-r from-slate-100 to-blue-100 dark:from-slate-800/50 dark:to-blue-900/30 rounded-xl p-6 border border-border/50">
-                <h4 className="font-semibold mb-4 flex items-center gap-2 text-lg">
-                  <Timer className="w-5 h-5 text-primary" />
-                  Instructions
-                </h4>
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-                  {breathingExercises[selectedExercise].steps.map((step, index) => (
-                    <div key={index} className="bg-background/80 dark:bg-background/20 rounded-lg p-3 border border-border/50">
-                      <div className="flex items-center gap-2 mb-2">
-                        <div className="w-6 h-6 rounded-full bg-gradient-to-r from-primary to-purple-600 text-white text-xs flex items-center justify-center font-semibold">
-                          {index + 1}
-                        </div>
-                        <span className="font-semibold text-primary text-sm">{step.phase}</span>
-                        <span className="text-xs text-muted-foreground bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded-full">
-                          {step.duration}s
-                        </span>
-                      </div>
-                      <p className="text-muted-foreground text-sm ml-8 leading-relaxed">{step.instruction}</p>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-4 text-center">
-                  <span className="text-xs text-muted-foreground bg-background/80 dark:bg-background/20 px-3 py-2 rounded-full border border-border/50">
-                    Complete {breathingExercises[selectedExercise].cycles} cycles
-                  </span>
-                </div>
-              </div>
-
-              {/* Tips */}
-              <div className="text-center bg-gradient-to-r from-green-50 to-blue-50 dark:from-green-900/20 dark:to-blue-900/20 rounded-xl p-4 border border-border/50">
-                <p className="text-sm sm:text-base text-muted-foreground">
-                  Find a comfortable position and focus on your breath
-                </p>
-              </div>
+            <div className="space-y-6">
+              <BreathingTimer />
             </div>
           )}
         </CardContent>

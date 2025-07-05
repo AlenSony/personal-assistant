@@ -2,7 +2,7 @@ import orbitAvatar from "@/assets/orbit-avatar.png";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
-import { History, Home, List, Settings as SettingsIcon, Smile } from "lucide-react";
+import { Heart, History, Home, List, Settings as SettingsIcon, Smile } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
 interface SidebarProps {
@@ -14,6 +14,7 @@ const navigationItems = [
   { to: "/", icon: Home, label: "Dashboard", end: true },
   { to: "/tasks", icon: List, label: "Tasks" },
   { to: "/mood", icon: Smile, label: "Mood" },
+  { to: "/wellness", icon: Heart, label: "Wellness" },
   { to: "/history", icon: History, label: "History" },
   { to: "/settings", icon: SettingsIcon, label: "Settings" },
 ];
