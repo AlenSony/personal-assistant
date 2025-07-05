@@ -102,6 +102,7 @@ export function MoodJournal() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [currentEntry, setCurrentEntry] = useState<JournalEntry | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+  const [isViewing, setIsViewing] = useState(false);
   const [selectedPrompt, setSelectedPrompt] = useState<JournalPrompt | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterMood, setFilterMood] = useState("");
@@ -165,6 +166,7 @@ export function MoodJournal() {
     
     setCurrentEntry(newEntry);
     setIsEditing(true);
+    setIsViewing(false);
     setSelectedPrompt(prompt || null);
     setActiveTab("write");
   };
@@ -191,6 +193,7 @@ export function MoodJournal() {
     
     setCurrentEntry(updatedEntry);
     setIsEditing(false);
+    setIsViewing(false);
   };
 
   const deleteEntry = (id: string) => {
@@ -332,31 +335,100 @@ export function MoodJournal() {
               </div>
             </CardHeader>
             <CardContent className="space-y-4">
-              {!isEditing ? (
-                <div className="text-center py-16">
-                  <div className="text-6xl mb-6">📝</div>
-                  <h3 className="text-2xl font-bold text-primary mb-4">
-                    Start Your Journal Entry
-                  </h3>
-                  <p className="text-muted-foreground mb-8">
-                    Express your thoughts, feelings, and experiences
-                  </p>
-                  <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                    <Button onClick={() => createNewEntry()} size="lg">
-                      <Plus className="w-5 h-5 mr-2" />
-                      Start Writing
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={() => setActiveTab("prompts")}
-                      size="lg"
-                    >
-                      <Lightbulb className="w-5 h-5 mr-2" />
-                      Get Inspired
-                    </Button>
-                  </div>
+                        {!isEditing && !isViewing ? (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-6">📝</div>
+              <h3 className="text-2xl font-bold text-primary mb-4">
+                Start Your Journal Entry
+              </h3>
+              <p className="text-muted-foreground mb-8">
+                Express your thoughts, feelings, and experiences
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button onClick={() => createNewEntry()} size="lg">
+                  <Plus className="w-5 h-5 mr-2" />
+                  Start Writing
+                </Button>
+                <Button 
+                  variant="outline" 
+                  onClick={() => setActiveTab("prompts")}
+                  size="lg"
+                >
+                  <Lightbulb className="w-5 h-5 mr-2" />
+                  Get Inspired
+                </Button>
+              </div>
+            </div>
+          ) : isViewing ? (
+            <div className="space-y-4">
+              <div className="flex items-center justify-between">
+                <input
+                  type="text"
+                  placeholder="Entry title..."
+                  value={currentEntry?.title || ''}
+                  disabled
+                  className="flex-1 text-lg font-semibold bg-transparent border-none outline-none text-muted-foreground"
+                />
+                <div className="flex items-center gap-2">
+                  <Badge className={getMoodColor(currentEntry?.mood || 'Neutral')}>
+                    {currentEntry?.mood || 'Neutral'}
+                  </Badge>
+                  {currentEntry?.isPrivate && (
+                    <Badge variant="outline">
+                      <EyeOff className="w-3 h-3 mr-1" />
+                      Private
+                    </Badge>
+                  )}
                 </div>
-              ) : (
+              </div>
+              
+              <div className="bg-muted/20 rounded-lg p-6 min-h-[300px]">
+                <div className="whitespace-pre-wrap text-base leading-relaxed">
+                  {currentEntry?.content || ''}
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between text-sm text-muted-foreground">
+                <span>{currentEntry?.wordCount || 0} words</span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  {currentEntry?.timestamp ? formatDate(currentEntry.timestamp) : ''}
+                </span>
+              </div>
+              
+              {currentEntry?.aiInsights && (
+                <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-border/50">
+                  <div className="flex items-center gap-2 mb-2">
+                    <Brain className="w-4 h-4 text-primary" />
+                    <span className="text-sm font-medium">AI Insight</span>
+                  </div>
+                  <p className="text-sm text-muted-foreground">{currentEntry.aiInsights}</p>
+                </div>
+              )}
+              
+              <div className="flex gap-2">
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setIsViewing(false);
+                    setCurrentEntry(null);
+                  }}
+                  className="flex-1"
+                >
+                  Back to History
+                </Button>
+                <Button 
+                  onClick={() => {
+                    setIsViewing(false);
+                    setIsEditing(true);
+                  }}
+                >
+                  <PenTool className="w-4 h-4 mr-2" />
+                  Edit Entry
+                </Button>
+              </div>
+            </div>
+          ) : (
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
                     <input
@@ -422,6 +494,7 @@ export function MoodJournal() {
                       variant="outline" 
                       onClick={() => {
                         setIsEditing(false);
+                        setIsViewing(false);
                         setCurrentEntry(null);
                         setSelectedPrompt(null);
                       }}
@@ -596,6 +669,7 @@ export function MoodJournal() {
                               onClick={() => {
                                 setCurrentEntry(entry);
                                 setIsEditing(false);
+                                setIsViewing(true);
                                 setActiveTab("write");
                               }}
                             >

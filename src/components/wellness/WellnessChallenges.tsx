@@ -7,7 +7,6 @@ import {
     BookOpen,
     CheckCircle,
     Crown,
-    Fire,
     Heart,
     Sparkles,
     Star,
@@ -100,7 +99,7 @@ const weeklyChallenges: Challenge[] = [
     difficulty: "medium",
     duration: 7,
     points: 50,
-    icon: <Fire className="w-5 h-5" />,
+    icon: <Zap className="w-5 h-5" />,
     color: "from-orange-500 to-red-500",
     requirements: ["7 consecutive days"],
     progress: 0,
@@ -159,7 +158,7 @@ const achievements: Achievement[] = [
     id: "week-streak",
     title: "Week Warrior",
     description: "Complete 7 days of challenges",
-    icon: <Fire className="w-4 h-4" />,
+    icon: <Zap className="w-4 h-4" />,
     color: "from-orange-400 to-orange-600",
     unlocked: false,
     rarity: "rare"
@@ -369,7 +368,7 @@ export function WellnessChallenges() {
         <Card className="border-none shadow-md bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20">
           <CardContent className="p-4 text-center">
             <div className="flex items-center justify-center gap-2 mb-2">
-              <Fire className="w-5 h-5 text-green-600" />
+              <Zap className="w-5 h-5 text-green-600" />
               <span className="text-sm font-medium">Current Streak</span>
             </div>
             <div className="text-2xl font-bold text-green-600">{currentStreak} days</div>
