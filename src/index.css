@@ -1,0 +1,184 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Orbit Design System - Soft pastels and calming blues */
+    --background: 220 20% 98%;
+    --foreground: 220 15% 20%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 25%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 20%;
+
+    /* Primary - Soft Ocean Blue */
+    --primary: 210 65% 55%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 210 40% 85%;
+    --primary-glow: 210 60% 75%;
+
+    /* Secondary - Lavender */
+    --secondary: 250 35% 88%;
+    --secondary-foreground: 250 15% 35%;
+
+    /* Muted - Soft Gray-Blue */
+    --muted: 220 25% 95%;
+    --muted-foreground: 220 15% 50%;
+
+    /* Accent - Mint Green */
+    --accent: 160 50% 85%;
+    --accent-foreground: 160 30% 25%;
+
+    /* Destructive - Soft Coral */
+    --destructive: 5 65% 65%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Success - Sage Green */
+    --success: 140 40% 70%;
+    --success-foreground: 140 30% 25%;
+
+    /* Warning - Soft Peach */
+    --warning: 35 70% 75%;
+    --warning-foreground: 35 30% 25%;
+
+    /* Mood Colors */
+    --mood-happy: 45 85% 75%;
+    --mood-calm: 195 50% 80%;
+    --mood-stressed: 15 60% 70%;
+    --mood-sad: 240 30% 75%;
+
+    --border: 220 20% 90%;
+    --input: 220 15% 94%;
+    --ring: 210 65% 55%;
+
+    --radius: 0.75rem;
+
+    /* Gradients for beautiful effects - simplified to avoid parsing issues */
+    --gradient-primary: linear-gradient(135deg, #4a90e2, #64b5f6);
+    --gradient-soft: linear-gradient(180deg, #f8fafc, #f1f5f9);
+    --gradient-mood: linear-gradient(45deg, #ffd54f, #81c784);
+
+    /* Shadows with personality - simplified */
+    --shadow-soft: 0 4px 12px -2px rgba(74, 144, 226, 0.08);
+    --shadow-hover: 0 8px 24px -4px rgba(74, 144, 226, 0.12);
+    --shadow-glow: 0 0 20px rgba(100, 181, 246, 0.15);
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  .dark {
+    /* Dark mode with softer, warmer tones */
+    --background: 220 15% 6%;
+    --foreground: 220 20% 95%;
+
+    --card: 220 15% 8%;
+    --card-foreground: 220 20% 95%;
+
+    --popover: 220 15% 8%;
+    --popover-foreground: 220 20% 95%;
+
+    /* Primary - Softer Ocean Blue for dark mode */
+    --primary: 210 50% 65%;
+    --primary-foreground: 220 15% 10%;
+    --primary-soft: 210 30% 15%;
+    --primary-glow: 210 45% 55%;
+
+    /* Secondary - Soft Lavender for dark mode */
+    --secondary: 250 20% 15%;
+    --secondary-foreground: 250 25% 85%;
+
+    /* Muted - Soft Dark Blue-Gray */
+    --muted: 220 15% 12%;
+    --muted-foreground: 220 15% 65%;
+
+    /* Accent - Mint Green for dark mode */
+    --accent: 160 25% 15%;
+    --accent-foreground: 160 40% 80%;
+
+    /* Destructive - Soft Coral for dark mode */
+    --destructive: 5 50% 55%;
+    --destructive-foreground: 0 0% 95%;
+
+    /* Success - Sage Green for dark mode */
+    --success: 140 30% 60%;
+    --success-foreground: 140 15% 15%;
+
+    /* Warning - Soft Peach for dark mode */
+    --warning: 35 50% 65%;
+    --warning-foreground: 35 15% 15%;
+
+    /* Mood Colors - Dark mode variants */
+    --mood-happy: 45 60% 65%;
+    --mood-calm: 195 30% 60%;
+    --mood-stressed: 15 45% 60%;
+    --mood-sad: 240 20% 55%;
+
+    --border: 220 15% 15%;
+    --input: 220 15% 12%;
+    --ring: 210 50% 65%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+@layer utilities {
+  /* Custom scrollbar styles for better cross-browser compatibility */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 3px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary) / 0.3);
+    border-radius: 3px;
+    transition: background-color 0.3s ease;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary) / 0.5);
+  }
+
+  /* Firefox scrollbar styles */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--primary) / 0.3) transparent;
+  }
+
+  .scrollbar-thin:hover {
+    scrollbar-color: hsl(var(--primary) / 0.5) transparent;
+  }
+}
