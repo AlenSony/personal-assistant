@@ -179,6 +179,48 @@ const emailCategories = [
   'Update', 'Coordination', 'External', 'Stakeholder'
 ];
 
+// Gemini API configuration
+const GEMINI_API_KEY = "AIzaSyAX2GDjNsefrcGvHUSncGZozX-rBvAGVBU";
+const GEMINI_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+
+interface GeminiResponse {
+  candidates: Array<{
+    content: {
+      parts: Array<{
+        text: string;
+      }>;
+    };
+  }>;
+}
+
+async function callGeminiAPI(prompt: string): Promise<string> {
+  try {
+    const response = await fetch(`${GEMINI_BASE_URL}?key=${GEMINI_API_KEY}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: prompt
+          }]
+        }]
+      })
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini API error: ${response.status} ${response.statusText}`);
+    }
+
+    const data: GeminiResponse = await response.json();
+    return data.candidates[0]?.content.parts[0]?.text || '';
+  } catch (error) {
+    console.error('Error calling Gemini API:', error);
+    throw error;
+  }
+}
+
 export function detectEmailRequirement(taskTitle: string, taskDescription: string, category: string): boolean {
   const text = `${taskTitle} ${taskDescription}`.toLowerCase();
   
@@ -217,7 +259,71 @@ export function determineEmailPurpose(taskTitle: string, taskDescription: string
   return 'general';
 }
 
-export function generateEmailSuggestion(context: EmailContext): EmailSuggestion {
+export async function generateEmailSuggestion(context: EmailContext): Promise<EmailSuggestion> {
+  try {
+    // Generate AI-powered email using Gemini
+    const aiEmail = await generateAIEmail(context);
+    return aiEmail;
+  } catch (error) {
+    console.error('Error generating AI email, falling back to template:', error);
+    // Fallback to template-based generation
+    return generateTemplateEmail(context);
+  }
+}
+
+async function generateAIEmail(context: EmailContext): Promise<EmailSuggestion> {
+  const prompt = `Generate a professional email based on the following task context:
+
+Task Title: ${context.taskTitle}
+Task Description: ${context.taskDescription || 'No description provided'}
+Category: ${context.category}
+Priority: ${context.priority}
+Due Date: ${context.dueDate || 'No due date'}
+Recipient: ${context.recipient || 'Recipient'}
+Purpose: ${context.purpose}
+
+Please generate:
+1. A professional subject line
+2. A well-written email body with appropriate tone
+3. The tone should be: ${context.priority === 'high' ? 'formal and urgent' : 'professional and friendly'}
+
+Requirements:
+- Keep the subject line concise and professional
+- Make the email body clear, concise, and actionable
+- Use appropriate greeting and closing
+- Include relevant context from the task
+- If it's urgent (high priority), convey urgency appropriately
+- If there's a due date, mention it appropriately
+- Replace [Recipient Name] with the suggested recipient
+- Replace [Your Name] with a placeholder for the sender's name
+
+Please format your response as:
+SUBJECT: [subject line]
+BODY: [email body]
+TONE: [formal/professional/friendly/urgent]`;
+
+  const response = await callGeminiAPI(prompt);
+  
+  // Parse the response
+  const subjectMatch = response.match(/SUBJECT:\s*(.+?)(?:\n|$)/i);
+  const bodyMatch = response.match(/BODY:\s*([\s\S]+?)(?:\nTONE:|$)/i);
+  const toneMatch = response.match(/TONE:\s*(.+?)(?:\n|$)/i);
+  
+  const subject = subjectMatch?.[1]?.trim() || `Re: ${context.taskTitle}`;
+  const body = bodyMatch?.[1]?.trim() || generateTemplateEmail(context).body;
+  const tone = (toneMatch?.[1]?.trim().toLowerCase() as any) || 'professional';
+  
+  const keyPoints = extractKeyPoints(context);
+  
+  return {
+    subject,
+    body,
+    tone,
+    keyPoints
+  };
+}
+
+function generateTemplateEmail(context: EmailContext): EmailSuggestion {
   const purpose = context.purpose;
   const tone = context.priority === 'high' ? 'formal' : 'professional';
   
