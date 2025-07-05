@@ -81,7 +81,7 @@ export function MoodChatbot({ onMoodChange }: MoodChatbotProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      text: "Hi! I'm Orbit, your AI companion. I'm here to chat, listen, and help you with whatever's on your mind. You can talk to me about anything - your day, your feelings, or just have a casual conversation. If you want me to analyze your mood, just let me know how you're feeling!",
+      text: "Hi! I'm AIRA, your personal daily life AI assistant. I'm here to chat, listen, and help you with whatever's on your mind. You can talk to me about anything - your day, your feelings, or just have a casual conversation. If you want to track your mood, just let me know and I'll help you analyze how you're feeling! 💫",
       sender: 'bot',
       timestamp: new Date(),
     }
@@ -283,7 +283,7 @@ export function MoodChatbot({ onMoodChange }: MoodChatbotProps) {
     setMessages([
       {
         id: '1',
-        text: "Hi! I'm Orbit, your AI companion. I'm here to chat, listen, and help you with whatever's on your mind. You can talk to me about anything - your day, your feelings, or just have a casual conversation. If you want me to analyze your mood, just let me know how you're feeling!",
+        text: "Hi! I'm AIRA, your personal daily life AI assistant. I'm here to chat, listen, and help you with whatever's on your mind. You can talk to me about anything - your day, your feelings, or just have a casual conversation. If you want to track your mood, just let me know and I'll help you analyze how you're feeling! 💫",
         sender: 'bot',
         timestamp: new Date(),
       }
@@ -312,7 +312,7 @@ export function MoodChatbot({ onMoodChange }: MoodChatbotProps) {
         <CardTitle className="flex items-center justify-between text-primary-foreground">
           <div className="flex items-center gap-2">
             <Bot className="w-5 h-5" />
-            AI Companion
+            Personal Daily Life AI Assistant
           </div>
           <Button
             variant="ghost"

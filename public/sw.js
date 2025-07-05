@@ -1,6 +1,6 @@
-// Service Worker for Orbit Flow Mind Notifications
+// Service Worker for AIRA Notifications
 
-const CACHE_NAME = 'orbit-flow-mind-v1';
+const CACHE_NAME = 'aira-v1';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -34,11 +34,11 @@ self.addEventListener('push', (event) => {
   console.log('Push event received:', event);
   
   let notificationData = {
-    title: 'Orbit Flow Mind',
+            title: 'AIRA',
     body: 'You have a new reminder!',
     icon: '/favicon.ico',
     badge: '/favicon.ico',
-    tag: 'orbit-reminder',
+          tag: 'aira-reminder',
     requireInteraction: false,
     data: {}
   };

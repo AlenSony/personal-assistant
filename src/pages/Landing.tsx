@@ -68,7 +68,7 @@ export function Landing({ onEnterApp }: LandingProps) {
             <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
               <Brain className="w-6 h-6 text-white" />
             </div>
-            <span className="text-2xl font-bold text-white">Orbit Flow Mind</span>
+            <span className="text-2xl font-bold text-white">AIRA</span>
           </div>
           
           <Button
@@ -101,10 +101,10 @@ export function Landing({ onEnterApp }: LandingProps) {
                 Your AI-Powered
                 <br />
                 <span className="bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-                  Mental Wellness
+                  Cognitive Wellness
                 </span>
                 <br />
-                Companion
+                Guide
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
@@ -168,7 +168,7 @@ export function Landing({ onEnterApp }: LandingProps) {
                 {isEntering ? (
                   <>
                     <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3" />
-                    Entering Orbit...
+                    Entering AIRA...
                   </>
                 ) : (
                   <>
@@ -188,7 +188,7 @@ export function Landing({ onEnterApp }: LandingProps) {
         {/* Footer */}
         <footer className="p-6 text-center">
           <p className="text-gray-400 text-sm">
-            © 2024 Orbit Flow Mind. Designed with ❤️ for your mental wellness.
+            Project developed by Team OLYMPUS for IEDC Vibe Coding Hackathon
           </p>
         </footer>
       </div>

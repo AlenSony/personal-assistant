@@ -7,6 +7,7 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { historyService, type HistoryEntry } from "@/services/history-service";
 import {
     CheckCircle,
@@ -91,6 +92,7 @@ function getMoodColor(label: string) {
 }
 
 export function Dashboard() {
+  useScrollToTop();
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
   const [userName] = useState("Friend"); // In a real app, this would come from user settings
@@ -104,6 +106,9 @@ export function Dashboard() {
   const [selectedBreathing, setSelectedBreathing] = useState(breathingTechniques[0]);
 
   useEffect(() => {
+    // Scroll to top when dashboard mounts
+    window.scrollTo(0, 0);
+    
     setHistoryData(historyService.getHistory());
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
     const affirmationTimer = setInterval(() => setAffirmationIndex(i => (i + 1) % affirmations.length), 10000);
@@ -300,7 +305,7 @@ export function Dashboard() {
   };
 
   return (
-    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto px-4 py-4 sm:py-8 overflow-x-hidden dashboard-container">
+    <div className="space-y-6 sm:space-y-8 max-w-7xl mx-auto px-4 py-4 sm:py-8 dashboard-container">
       {/* Enhanced Header Section */}
       <div className="text-center space-y-4 sm:space-y-6">
         <div className="relative">
@@ -511,7 +516,7 @@ export function Dashboard() {
             <div className="w-8 h-8 bg-gradient-to-br from-primary to-purple-600 rounded-full flex items-center justify-center text-white">
               <Sparkles className="w-4 h-4" />
             </div>
-            Chat with Orbit
+                            Chat with AIRA
           </CardTitle>
         </CardHeader>
         <CardContent>

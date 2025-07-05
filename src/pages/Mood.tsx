@@ -269,7 +269,7 @@ export default function Mood() {
       <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 mb-8 sm:mb-12">
         <img 
           src={orbitAvatar} 
-          alt="Orbit" 
+          alt="AIRA" 
           className="w-16 h-16 sm:w-20 sm:h-20 rounded-full shadow-lg"
         />
         <div className="text-center sm:text-left">

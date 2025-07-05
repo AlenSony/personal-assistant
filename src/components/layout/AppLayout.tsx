@@ -17,7 +17,7 @@ export function AppLayout() {
         >
           {sidebarCollapsed ? "☰" : "✕"}
         </button>
-        <span className="font-bold text-lg">Orbit</span>
+        <span className="font-bold text-lg">AIRA</span>
         <ThemeToggle />
       </div>
       <div className="flex w-full">

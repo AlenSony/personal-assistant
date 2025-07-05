@@ -428,6 +428,7 @@ All colors MUST be HSL.
 
   .dashboard-container {
     @apply px-2 sm:px-4;
+    scroll-behavior: smooth;
   }
 
   .quick-actions-grid {

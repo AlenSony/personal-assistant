@@ -98,8 +98,8 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
             </div>
             {!collapsed && (
               <div>
-                <h1 className="text-xl font-bold gradient-text">Orbit Flow</h1>
-                <p className="text-xs text-muted-foreground">Mind & Productivity</p>
+                <h1 className="text-xl font-bold gradient-text">AIRA</h1>
+                <p className="text-xs text-muted-foreground">Personal Daily Life AI Assistant</p>
               </div>
             )}
           </div>
@@ -108,7 +108,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           {!collapsed && (
             <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50 hover:bg-muted/80 transition-colors cursor-pointer">
               <Avatar className="w-10 h-10 border-2 border-primary/20">
-                <AvatarImage src="/orbit-avatar.png" alt="User" />
+                <AvatarImage src="/orbit-avatar.png" alt="AIRA" />
                 <AvatarFallback className="bg-gradient-to-br from-primary to-purple-600 text-white">
                   U
                 </AvatarFallback>
@@ -246,7 +246,7 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
           {!collapsed && (
             <div className="text-center">
               <p className="text-xs text-muted-foreground">
-                Orbit Flow v1.0.0
+                AIRA v1.0.0
               </p>
               <p className="text-xs text-muted-foreground">
                 Made with ❤️ for your mind

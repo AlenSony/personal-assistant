@@ -225,12 +225,12 @@ export class AIService {
     }
     
     // General greetings
-    return `${timeGreeting}I'm Orbit, your AI companion! I'm here to chat, listen, and support you. How are you doing today? 💫`;
+    return `${timeGreeting}I'm AIRA, your personal daily life AI assistant! I'm here to chat, listen, and support you. How are you doing today? 💫`;
   }
 
   // Generate conversational response without mood analysis
   private async generateConversationalResponse(text: string, context: string): Promise<string> {
-    const prompt = `You are Orbit, a friendly and supportive AI companion. You're having a casual conversation with a user.
+    const prompt = `You are AIRA, a friendly and supportive personal daily life AI assistant. You're having a casual conversation with a user.
 
 Recent conversation context:
 ${context}

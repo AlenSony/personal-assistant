@@ -12,7 +12,7 @@ export default function Settings() {
         <div>
           <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Settings</h1>
           <p className="text-sm sm:text-base text-muted-foreground">
-            Configure your Orbit Flow Mind experience ⚙️
+            Configure your AIRA experience ⚙️
           </p>
         </div>
       </div>
@@ -137,14 +137,14 @@ export default function Settings() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <SettingsIcon className="w-5 h-5" />
-            About Orbit Flow Mind
+            About AIRA
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-3">
             <div className="text-sm text-muted-foreground">
               <p className="mb-2">
-                Orbit Flow Mind is your AI-powered companion for mental wellness and productivity.
+                AIRA is your AI-powered personal daily life assistant for mental wellness and productivity.
               </p>
               <p className="mb-2">
                 Features include:
