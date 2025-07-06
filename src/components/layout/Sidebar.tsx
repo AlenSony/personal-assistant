@@ -1,16 +1,18 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/Logo";
 import { Switch } from "@/components/ui/switch";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/hooks/use-theme";
 import { cn } from "@/lib/utils";
-import { BarChart3, CheckSquare, ChevronDown, Heart, History, Home, List, Moon, Settings as SettingsIcon, Smile, Sparkles, Sun, Target } from "lucide-react";
+import { BarChart3, CheckSquare, ChevronDown, Heart, History, Home, List, LogOut, Moon, Settings as SettingsIcon, Smile, Sparkles, Sun, Target } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 interface SidebarProps {
   collapsed: boolean;
   onToggle: () => void;
+  onLogout: () => void;
 }
 
 const navigationItems = [
@@ -24,7 +26,7 @@ const navigationItems = [
   { to: "/settings", icon: SettingsIcon, label: "Settings" },
 ];
 
-export function Sidebar({ collapsed, onToggle }: SidebarProps) {
+export function Sidebar({ collapsed, onToggle, onLogout }: SidebarProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { theme, setTheme } = useTheme();
@@ -90,17 +92,10 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
         {/* Enhanced Header */}
         <div className={cn("border-b border-border", collapsed ? "p-2" : "p-6")}>
           <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3 mb-6")}>
-            <div className="relative">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-purple-600 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                O
-              </div>
-              <div className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-background animate-pulse"></div>
-            </div>
-            {!collapsed && (
-              <div>
-                <h1 className="text-xl font-bold gradient-text">AIRA</h1>
-                <p className="text-xs text-muted-foreground">Personal Daily Life AI Assistant</p>
-              </div>
+            {collapsed ? (
+              <Logo size="sm" variant="minimal" />
+            ) : (
+              <Logo size="md" variant="default" />
             )}
           </div>
           
@@ -241,6 +236,31 @@ export function Sidebar({ collapsed, onToggle }: SidebarProps) {
               </Button>
             </div>
           )}
+
+          {/* Logout Button */}
+          <div className={cn("flex items-center rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors", collapsed ? "justify-center p-2" : "justify-between p-3")}>
+            <div className={cn("flex items-center", collapsed ? "justify-center" : "gap-3")}>
+              <div className="w-8 h-8 rounded-lg bg-muted/50 flex items-center justify-center">
+                <LogOut className="w-4 h-4 text-red-500" />
+              </div>
+              {!collapsed && (
+                <div>
+                  <p className="text-sm font-medium">Account</p>
+                  <p className="text-xs text-muted-foreground">Sign out</p>
+                </div>
+              )}
+            </div>
+            {!collapsed && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onLogout}
+                className="text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-950"
+              >
+                Logout
+              </Button>
+            )}
+          </div>
 
           {/* App Version */}
           {!collapsed && (

@@ -141,6 +141,56 @@ export class AIService {
     return false;
   }
 
+  // Check if user is asking for practical assistance (recipes, activities, etc.)
+  private shouldProvidePracticalAssistance(text: string): boolean {
+    const lowerText = text.toLowerCase();
+    
+    // Recipe-related keywords
+    const recipeKeywords = [
+      'recipe', 'cook', 'cooking', 'food', 'dish', 'meal', 'ingredients',
+      'how to make', 'how to cook', 'what to eat', 'dinner', 'lunch', 'breakfast',
+      'snack', 'dessert', 'appetizer', 'main course', 'side dish', 'vegetarian',
+      'vegan', 'gluten-free', 'healthy', 'quick', 'easy', 'simple'
+    ];
+    
+    // Activity and productivity keywords
+    const activityKeywords = [
+      'what should i do', 'what to do', 'activities', 'hobby', 'hobbies',
+      'productive', 'productivity', 'organize', 'plan', 'schedule',
+      'workout', 'exercise', 'fitness', 'meditation', 'reading', 'learning',
+      'creative', 'art', 'music', 'writing', 'garden', 'craft', 'diy'
+    ];
+    
+    // Daily life assistance keywords
+    const dailyLifeKeywords = [
+      'routine', 'morning routine', 'evening routine', 'self-care',
+      'cleaning', 'organizing', 'declutter', 'budget', 'finance', 'saving',
+      'time management', 'goal setting', 'motivation', 'inspiration'
+    ];
+    
+    // Check for recipe requests
+    if (recipeKeywords.some(keyword => lowerText.includes(keyword))) {
+      return true;
+    }
+    
+    // Check for activity requests
+    if (activityKeywords.some(keyword => lowerText.includes(keyword))) {
+      return true;
+    }
+    
+    // Check for daily life assistance
+    if (dailyLifeKeywords.some(keyword => lowerText.includes(keyword))) {
+      return true;
+    }
+    
+    // Check for general "what should I do" questions
+    if (lowerText.includes('what should i do') || lowerText.includes('what to do today')) {
+      return true;
+    }
+    
+    return false;
+  }
+
   // Main conversation handler
   async processMessage(text: string): Promise<{ response: string; moodAnalysis?: MoodAnalysis }> {
     try {
@@ -162,6 +212,10 @@ export class AIService {
           response: moodAnalysis.formattedResponse,
           moodAnalysis
         };
+      } else if (this.shouldProvidePracticalAssistance(text)) {
+        // Provide practical assistance (recipes, activities, etc.)
+        const response = await this.generatePracticalAssistance(text, conversationContext);
+        return { response };
       } else {
         // Provide general conversation
         const response = await this.generateConversationalResponse(text, conversationContext);
@@ -247,6 +301,70 @@ Respond naturally and conversationally. Be supportive, empathetic, and engaging.
 Don't analyze their mood unless they specifically ask. Just be a good conversational partner.
 
 Respond naturally without any special formatting.`;
+
+    const response = await this.callGeminiAPI(prompt);
+    return response.trim();
+  }
+
+  // Generate practical assistance (recipes, activities, daily life help)
+  private async generatePracticalAssistance(text: string, context: string): Promise<string> {
+    const lowerText = text.toLowerCase();
+    
+    // Determine the type of practical assistance needed
+    let assistanceType = 'general';
+    if (lowerText.includes('recipe') || lowerText.includes('cook') || lowerText.includes('food') || 
+        lowerText.includes('dish') || lowerText.includes('meal') || lowerText.includes('ingredients')) {
+      assistanceType = 'recipe';
+    } else if (lowerText.includes('what should i do') || lowerText.includes('what to do') || 
+               lowerText.includes('activities') || lowerText.includes('hobby')) {
+      assistanceType = 'activities';
+    } else if (lowerText.includes('routine') || lowerText.includes('schedule') || 
+               lowerText.includes('organize') || lowerText.includes('plan')) {
+      assistanceType = 'routine';
+    }
+
+    const prompt = `You are AIRA, a helpful personal daily life AI assistant. The user is asking for practical assistance.
+
+Recent conversation context:
+${context}
+
+User's request: "${text}"
+
+Type of assistance needed: ${assistanceType}
+
+Provide helpful, practical, and actionable advice. Be specific and detailed when appropriate.
+
+For recipes:
+- Include ingredients, steps, cooking time, and tips
+- Suggest variations or substitutions when possible
+- Consider dietary restrictions if mentioned
+- Make it easy to follow
+
+For activities:
+- Suggest specific, actionable activities
+- Consider the user's interests and energy level
+- Include both indoor and outdoor options
+- Suggest activities for different time durations
+
+For routines and organization:
+- Provide structured, step-by-step guidance
+- Include time management tips
+- Suggest tools or methods that might help
+- Be encouraging and realistic
+
+For general practical help:
+- Be specific and actionable
+- Consider the user's situation
+- Provide multiple options when possible
+- Include helpful tips and resources
+
+Format your response clearly with:
+- **Bold headers** for sections
+- Bullet points for lists
+- Clear, easy-to-follow instructions
+- Encouraging and supportive tone
+
+Keep responses comprehensive but not overwhelming. Focus on being genuinely helpful.`;
 
     const response = await this.callGeminiAPI(prompt);
     return response.trim();

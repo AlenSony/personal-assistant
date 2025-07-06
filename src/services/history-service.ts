@@ -1,3 +1,5 @@
+import { authService } from "./auth-service";
+
 export interface HistoryEntry {
   date: Date;
   mood?: {
@@ -34,9 +36,15 @@ export interface MoodEntry {
 }
 
 class HistoryService {
-  private readonly HISTORY_KEY = 'orbit-history';
-  private readonly TASKS_KEY = 'orbit-tasks';
-  private readonly MOODS_KEY = 'orbit-moods';
+  private readonly HISTORY_KEY = 'aira-history';
+  private readonly TASKS_KEY = 'aira-tasks';
+  private readonly MOODS_KEY = 'aira-moods';
+
+  // Get user-specific storage key
+  private getUserKey(baseKey: string): string {
+    const userId = authService.getCurrentUser()?.id || 'anonymous';
+    return `${baseKey}-${userId}`;
+  }
 
   // Save task to history
   saveTask(task: TaskEntry) {
@@ -150,7 +158,8 @@ class HistoryService {
   // Get history data
   getHistory(): HistoryEntry[] {
     try {
-      const saved = localStorage.getItem(this.HISTORY_KEY);
+      const userKey = this.getUserKey(this.HISTORY_KEY);
+      const saved = localStorage.getItem(userKey);
       if (saved) {
         const parsed = JSON.parse(saved);
         // Convert date strings back to Date objects
@@ -169,7 +178,8 @@ class HistoryService {
   // Save history data
   private saveHistory(history: HistoryEntry[]) {
     try {
-      localStorage.setItem(this.HISTORY_KEY, JSON.stringify(history));
+      const userKey = this.getUserKey(this.HISTORY_KEY);
+      localStorage.setItem(userKey, JSON.stringify(history));
     } catch (error) {
       console.error('Error saving history:', error);
     }
@@ -178,7 +188,8 @@ class HistoryService {
   // Get tasks for today
   getTodayTasks(): TaskEntry[] {
     try {
-      const saved = localStorage.getItem(this.TASKS_KEY);
+      const userKey = this.getUserKey(this.TASKS_KEY);
+      const saved = localStorage.getItem(userKey);
       if (saved) {
         const tasks = JSON.parse(saved);
         const today = new Date();
@@ -200,10 +211,11 @@ class HistoryService {
   // Save task
   saveTaskToStorage(task: TaskEntry) {
     try {
-      const saved = localStorage.getItem(this.TASKS_KEY);
+      const userKey = this.getUserKey(this.TASKS_KEY);
+      const saved = localStorage.getItem(userKey);
       const tasks = saved ? JSON.parse(saved) : [];
       tasks.push(task);
-      localStorage.setItem(this.TASKS_KEY, JSON.stringify(tasks));
+      localStorage.setItem(userKey, JSON.stringify(tasks));
       
       // Also save to history
       this.saveTask(task);
@@ -215,14 +227,15 @@ class HistoryService {
   // Update task completion
   updateTaskCompletion(taskId: number, completed: boolean) {
     try {
-      const saved = localStorage.getItem(this.TASKS_KEY);
+      const userKey = this.getUserKey(this.TASKS_KEY);
+      const saved = localStorage.getItem(userKey);
       if (saved) {
         const tasks = JSON.parse(saved);
         const taskIndex = tasks.findIndex((task: TaskEntry) => task.id === taskId);
         
         if (taskIndex !== -1) {
           tasks[taskIndex].completed = completed;
-          localStorage.setItem(this.TASKS_KEY, JSON.stringify(tasks));
+          localStorage.setItem(userKey, JSON.stringify(tasks));
           
           // Update history
           this.saveTask(tasks[taskIndex]);
@@ -236,10 +249,11 @@ class HistoryService {
   // Save mood to storage
   saveMoodToStorage(mood: MoodEntry) {
     try {
-      const saved = localStorage.getItem(this.MOODS_KEY);
+      const userKey = this.getUserKey(this.MOODS_KEY);
+      const saved = localStorage.getItem(userKey);
       const moods = saved ? JSON.parse(saved) : [];
       moods.push(mood);
-      localStorage.setItem(this.MOODS_KEY, JSON.stringify(moods));
+      localStorage.setItem(userKey, JSON.stringify(moods));
       
       // Also save to history
       this.saveMood(mood);
@@ -251,11 +265,69 @@ class HistoryService {
   // Clear all data (for testing/reset)
   clearAllData() {
     try {
-      localStorage.removeItem(this.HISTORY_KEY);
-      localStorage.removeItem(this.TASKS_KEY);
-      localStorage.removeItem(this.MOODS_KEY);
+      const historyKey = this.getUserKey(this.HISTORY_KEY);
+      const tasksKey = this.getUserKey(this.TASKS_KEY);
+      const moodsKey = this.getUserKey(this.MOODS_KEY);
+      
+      localStorage.removeItem(historyKey);
+      localStorage.removeItem(tasksKey);
+      localStorage.removeItem(moodsKey);
     } catch (error) {
       console.error('Error clearing data:', error);
+    }
+  }
+
+  // Clear user-specific data (for logout/account deletion)
+  clearUserData() {
+    try {
+      const historyKey = this.getUserKey(this.HISTORY_KEY);
+      const tasksKey = this.getUserKey(this.TASKS_KEY);
+      const moodsKey = this.getUserKey(this.MOODS_KEY);
+      
+      localStorage.removeItem(historyKey);
+      localStorage.removeItem(tasksKey);
+      localStorage.removeItem(moodsKey);
+    } catch (error) {
+      console.error('Error clearing user data:', error);
+    }
+  }
+
+  // Get all tasks (not just today's)
+  getAllTasks(): TaskEntry[] {
+    try {
+      const userKey = this.getUserKey(this.TASKS_KEY);
+      const saved = localStorage.getItem(userKey);
+      if (saved) {
+        const tasks = JSON.parse(saved);
+        return tasks.map((task: any) => ({
+          ...task,
+          createdAt: new Date(task.createdAt),
+          dueDate: task.dueDate ? new Date(task.dueDate) : undefined
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error('Error loading all tasks:', error);
+      return [];
+    }
+  }
+
+  // Get all moods
+  getAllMoods(): MoodEntry[] {
+    try {
+      const userKey = this.getUserKey(this.MOODS_KEY);
+      const saved = localStorage.getItem(userKey);
+      if (saved) {
+        const moods = JSON.parse(saved);
+        return moods.map((mood: any) => ({
+          ...mood,
+          timestamp: new Date(mood.timestamp)
+        }));
+      }
+      return [];
+    } catch (error) {
+      console.error('Error loading all moods:', error);
+      return [];
     }
   }
 }

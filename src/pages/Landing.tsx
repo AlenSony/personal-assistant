@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Logo } from "@/components/ui/Logo";
 import { SplashCursor } from "@/components/ui/splash-cursor";
 import { ArrowRight, Brain, Heart, Pause, Play, Sparkles, Zap } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -67,12 +68,7 @@ export function Landing({ onEnterApp }: LandingProps) {
         <div className="relative z-10 min-h-screen flex flex-col">
           {/* Header */}
           <header className="flex justify-between items-center p-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
-                <Brain className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-2xl font-bold text-white">AIRA</span>
-            </div>
+            <Logo size="md" variant="default" className="text-white" />
             
             <Button
               variant="ghost"
@@ -91,9 +87,7 @@ export function Landing({ onEnterApp }: LandingProps) {
               <div className="space-y-6">
                 <div className="flex justify-center">
                   <div className="relative">
-                    <div className="w-24 h-24 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center animate-pulse">
-                      <Brain className="w-12 h-12 text-white" />
-                    </div>
+                    <Logo size="hero" variant="hero" />
                     <div className="absolute -top-2 -right-2 w-8 h-8 bg-success rounded-full flex items-center justify-center">
                       <Sparkles className="w-4 h-4 text-white" />
                     </div>
@@ -199,9 +193,9 @@ export function Landing({ onEnterApp }: LandingProps) {
         {/* Loading Overlay */}
         {!isVideoLoaded && (
           <div className="absolute inset-0 z-20 bg-black flex items-center justify-center">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-white text-lg">Loading your wellness journey...</p>
+            <div className="text-center">
+              <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-white text-lg">Loading AIRA...</p>
             </div>
           </div>
         )}

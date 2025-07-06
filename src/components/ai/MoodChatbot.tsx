@@ -81,7 +81,7 @@ export function MoodChatbot({ onMoodChange }: MoodChatbotProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([
     {
       id: '1',
-      text: "Hi! I'm AIRA, your personal daily life AI assistant. I'm here to chat, listen, and help you with whatever's on your mind. You can talk to me about anything - your day, your feelings, or just have a casual conversation. If you want to track your mood, just let me know and I'll help you analyze how you're feeling! 💫",
+      text: "Hi! I'm AIRA, your personal daily life AI assistant. I'm here to chat, listen, and help you with whatever's on your mind. You can talk to me about anything - your day, your feelings, ask for recipes, get activity suggestions, or just have a casual conversation. If you want to track your mood, just let me know and I'll help you analyze how you're feeling! 💫",
       sender: 'bot',
       timestamp: new Date(),
     }
@@ -163,7 +163,8 @@ export function MoodChatbot({ onMoodChange }: MoodChatbotProps) {
     { id: "general", label: "General Chat", icon: MessageCircle },
     { id: "stress", label: "Stress Relief", icon: Lightbulb },
     { id: "gratitude", label: "Gratitude", icon: Heart },
-    { id: "goals", label: "Goal Setting", icon: TrendingUp }
+    { id: "goals", label: "Goal Setting", icon: TrendingUp },
+    { id: "practical", label: "Practical Help", icon: Lightbulb }
   ];
 
   // Handle quick mood selection
@@ -179,6 +180,7 @@ export function MoodChatbot({ onMoodChange }: MoodChatbotProps) {
       stress: "Let's focus on stress relief and relaxation techniques. What's been causing you stress lately?",
       gratitude: "Let's explore gratitude and positive thinking. What are you thankful for today?",
       goals: "Let's talk about your goals and aspirations. What would you like to achieve?",
+      practical: "I'm here to help with practical tasks! Need a recipe, activity suggestions, or help organizing your day?",
       general: "I'm here for whatever you'd like to talk about. How are you feeling?"
     };
     
@@ -283,7 +285,7 @@ export function MoodChatbot({ onMoodChange }: MoodChatbotProps) {
     setMessages([
       {
         id: '1',
-        text: "Hi! I'm AIRA, your personal daily life AI assistant. I'm here to chat, listen, and help you with whatever's on your mind. You can talk to me about anything - your day, your feelings, or just have a casual conversation. If you want to track your mood, just let me know and I'll help you analyze how you're feeling! 💫",
+        text: "Hi! I'm AIRA, your personal daily life AI assistant. I'm here to chat, listen, and help you with whatever's on your mind. You can talk to me about anything - your day, your feelings, ask for recipes, get activity suggestions, or just have a casual conversation. If you want to track your mood, just let me know and I'll help you analyze how you're feeling! 💫",
         sender: 'bot',
         timestamp: new Date(),
       }
@@ -578,16 +580,18 @@ export function MoodChatbot({ onMoodChange }: MoodChatbotProps) {
 
             <div className="text-xs text-muted-foreground space-y-1">
               <div className="flex items-center gap-4">
-                <span>💡 Chat naturally or express your mood</span>
+                <span>💡 Chat naturally, express your mood, or ask for help</span>
                 <span>📊 {moodHistory.length} mood entries tracked</span>
               </div>
               <div className="flex flex-wrap gap-2 text-xs">
                 <span>Examples:</span>
                 <span className="text-primary">"I'm feeling overwhelmed"</span>
                 <span>•</span>
-                <span className="text-primary">"How was your day?"</span>
+                <span className="text-primary">"What should I do today?"</span>
                 <span>•</span>
-                <span className="text-primary">"Tell me a joke"</span>
+                <span className="text-primary">"Recipe for pasta"</span>
+                <span>•</span>
+                <span className="text-primary">"Help me organize my day"</span>
               </div>
             </div>
           </div>

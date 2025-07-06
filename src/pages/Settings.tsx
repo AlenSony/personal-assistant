@@ -1,10 +1,38 @@
+import { UserProfile } from "@/components/auth/UserProfile";
 import { NotificationTest } from "@/components/notifications/NotificationTest";
 import { SmartNotifications } from "@/components/notifications/SmartNotifications";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { Bot, Palette, Settings as SettingsIcon, Shield } from "lucide-react";
+import { VoiceCommandsHelp } from "@/components/voice/VoiceCommandsHelp";
+import { VoiceSettings } from "@/components/voice/VoiceSettings";
+import { authService } from "@/services/auth-service";
+import { Bot, Palette, Settings as SettingsIcon, Shield, User } from "lucide-react";
+import { useEffect, useState } from "react";
 
 export default function Settings() {
+  const [currentUser, setCurrentUser] = useState(authService.getCurrentUser());
+
+  useEffect(() => {
+    // Update user when auth state changes
+    const user = authService.getCurrentUser();
+    setCurrentUser(user);
+  }, []);
+
+  const handleUserUpdate = (updatedUser: any) => {
+    setCurrentUser(updatedUser);
+  };
+
+  if (!currentUser) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading user profile...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 sm:space-y-6 animate-fade-in">
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4">
@@ -16,6 +44,19 @@ export default function Settings() {
           </p>
         </div>
       </div>
+
+      {/* User Profile Section */}
+      <Card className="border-none shadow-md">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="w-5 h-5" />
+            Account & Profile
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <UserProfile user={currentUser} onUserUpdate={handleUserUpdate} />
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         {/* Appearance */}
@@ -132,6 +173,12 @@ export default function Settings() {
         </CardContent>
       </Card>
 
+      {/* Voice Assistant Settings */}
+      <VoiceSettings />
+
+      {/* Voice Commands Help */}
+      <VoiceCommandsHelp />
+
       {/* About */}
       <Card className="border-none shadow-md">
         <CardHeader>
@@ -156,6 +203,8 @@ export default function Settings() {
                 <li>Progress tracking and insights</li>
                 <li>Personalized recommendations</li>
                 <li>Smart notifications</li>
+                <li>Voice assistant integration</li>
+                <li>Secure user authentication</li>
               </ul>
             </div>
             

@@ -7,12 +7,13 @@ import {
     DialogHeader,
     DialogTitle
 } from "@/components/ui/dialog";
-import { useScrollToTop } from "@/hooks/use-scroll-to-top";
+import { authService } from "@/services/auth-service";
 import { historyService, type HistoryEntry } from "@/services/history-service";
 import {
     CheckCircle,
     Clock,
     Heart,
+    Mic,
     Pause,
     Plus,
     RefreshCw,
@@ -26,6 +27,7 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { MoodChatbot } from "../ai/MoodChatbot";
 import { TaskQuickAdd } from "../tasks/TaskQuickAdd";
+import { VoiceAssistant } from "../voice/VoiceAssistant";
 
 const affirmations = [
   "You are enough, just as you are.",
@@ -92,10 +94,9 @@ function getMoodColor(label: string) {
 }
 
 export function Dashboard() {
-  useScrollToTop();
   const navigate = useNavigate();
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [userName] = useState("Friend"); // In a real app, this would come from user settings
+  const [userName, setUserName] = useState("Friend");
   const [affirmationIndex, setAffirmationIndex] = useState(0);
   const [historyData, setHistoryData] = useState<HistoryEntry[]>([]);
   const [showQuickMood, setShowQuickMood] = useState(false);
@@ -106,8 +107,11 @@ export function Dashboard() {
   const [selectedBreathing, setSelectedBreathing] = useState(breathingTechniques[0]);
 
   useEffect(() => {
-    // Scroll to top when dashboard mounts
-    window.scrollTo(0, 0);
+    // Get user name from auth service
+    const currentUser = authService.getCurrentUser();
+    if (currentUser) {
+      setUserName(currentUser.name);
+    }
     
     setHistoryData(historyService.getHistory());
     const timer = setInterval(() => setCurrentTime(new Date()), 60000);
@@ -203,20 +207,22 @@ export function Dashboard() {
   const taskStreak = useMemo(() => {
     let streak = 0;
     for (let i = last7.length - 1; i >= 0; i--) {
-      const d = last7[i].date;
       const entry = historyData.find(h => {
         const hd = new Date(h.date);
         hd.setHours(0, 0, 0, 0);
+        const d = new Date();
+        d.setDate(d.getDate() - (last7.length - 1 - i));
+        d.setHours(0, 0, 0, 0);
         return hd.getTime() === d.getTime();
       });
-      if (entry && entry.tasksTotal > 0 && entry.tasksCompleted === entry.tasksTotal) {
+      if (entry && entry.tasksCompleted > 0) {
         streak++;
       } else {
         break;
       }
     }
     return streak;
-  }, [last7, historyData]);
+  }, [historyData, last7]);
 
   // Recent activity (last 3 days)
   const recent = last7.slice(-3).reverse();
@@ -521,6 +527,36 @@ export function Dashboard() {
         </CardHeader>
         <CardContent>
           <MoodChatbot />
+        </CardContent>
+      </Card>
+
+      {/* Voice Assistant Section */}
+      <Card className="card-hover border-none shadow-lg">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-full flex items-center justify-center text-white">
+              <Mic className="w-4 h-4" />
+            </div>
+            Voice Assistant
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <VoiceAssistant 
+            onQuickMood={(mood) => {
+              // Handle quick mood logging
+              const moodEntry = quickMoods.find(m => m.label === mood);
+              if (moodEntry) {
+                handleQuickMood(moodEntry);
+              }
+            }}
+            onQuickTask={(task) => {
+              // Handle quick task creation
+              // This would integrate with your task service
+              console.log("Voice task:", task);
+            }}
+            onStartBreathing={() => setShowBreathingOptions(true)}
+            onStopBreathing={handleStopBreathing}
+          />
         </CardContent>
       </Card>
 

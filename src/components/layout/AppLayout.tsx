@@ -1,10 +1,15 @@
+import { Logo } from "@/components/ui/Logo";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import { Sidebar } from "./Sidebar";
 
-export function AppLayout() {
+interface AppLayoutProps {
+  onLogout: () => void;
+}
+
+export function AppLayout({ onLogout }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   return (
@@ -17,13 +22,14 @@ export function AppLayout() {
         >
           {sidebarCollapsed ? "☰" : "✕"}
         </button>
-        <span className="font-bold text-lg">AIRA</span>
+        <Logo size="sm" variant="minimal" />
         <ThemeToggle />
       </div>
       <div className="flex w-full">
         <Sidebar 
           collapsed={sidebarCollapsed} 
-          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)} 
+          onToggle={() => setSidebarCollapsed(!sidebarCollapsed)}
+          onLogout={onLogout}
         />
         
         <main 
